@@ -58,6 +58,7 @@ private:
     void updateChart(double usage);
     Resmon::CPUStats prevCpuStats;
     QTimer *resourceTimer;
+    QTimer* chartUpdateTimer;
 };
 
 #endif // MAINWINDOW_H

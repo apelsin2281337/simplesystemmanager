@@ -50,11 +50,18 @@ MainWindow::MainWindow(QWidget *parent)
         updateDiskUsage();
     });
     //частота обновления в миллисекундах это вот эта циферка
-    resourceTimer->start(1);
-
+    resourceTimer->start(1000);
+    createCpuLoadChart();
+    chartUpdateTimer = new QTimer(this);
+    connect(chartUpdateTimer, &QTimer::timeout, this, [this]() {
+        Resmon::CPUStats current = Resmon::get_cpu_usage();
+        double usage = current.usage_percent(prevCpuStats);
+        prevCpuStats = current;
+        updateChart(usage);
+    });
+    chartUpdateTimer->start(150);
 
     populateServicesTable();
-
 }
 
 MainWindow::~MainWindow()
@@ -251,7 +258,7 @@ void MainWindow::on_deleteSelectedFilesButton_clicked()
         }
     }
 
-    // Remove deleted files from the model
+
     for (int i = tempFilesModel->rowCount() - 1; i >= 0; --i) {
         if (ui->tempFilesTable->selectionModel()->isRowSelected(i, QModelIndex())) {
             tempFilesModel->removeRow(i);
@@ -263,10 +270,8 @@ void MainWindow::on_deleteSelectedFilesButton_clicked()
 
 void MainWindow::on_searchServicesTextChanged(const QString &text)
 {
-    // Filter on all columns (0=Service, 1=Description, 2=Status)
-    servicesProxyModel->setFilterKeyColumn(-1); // -1 means all columns
 
-    // Set the filter text
+    servicesProxyModel->setFilterKeyColumn(-1);
     servicesProxyModel->setFilterFixedString(text);
 }
 
@@ -300,6 +305,20 @@ void MainWindow::createCpuLoadChart() {
 
 void MainWindow::updateChart(double usage) {
     static int x = 0;
+    const int xlim = 50;
+    series->append(x++, usage);
+
+    if (series->count() > xlim) {
+        series->remove(0);
+    }
+
+    axisX->setRange(x-xlim, x);
+}
+
+
+/*
+void MainWindow::updateChart(double usage) {
+    static int x = 0;
     series->append(x++, usage);
 
     if (series->count() > 60) {
@@ -308,7 +327,7 @@ void MainWindow::updateChart(double usage) {
 
     axisX->setRange(qMax(0, x-20), x);
 }
-
+*/
 void MainWindow::updateCpuUsage() {
     Resmon::CPUStats current = Resmon::get_cpu_usage();
     double usage = current.usage_percent(prevCpuStats);
@@ -316,11 +335,6 @@ void MainWindow::updateCpuUsage() {
 
     ui->cpuUsageBar->setValue(static_cast<int>(usage));
     ui->cpuUsageLabel->setText(QString("%1%").arg(usage, 0, 'f', 1));
-
-    if (!chart) {
-        createCpuLoadChart();
-    }
-    updateChart(usage);
 }
 
 
