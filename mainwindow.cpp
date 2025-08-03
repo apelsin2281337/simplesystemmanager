@@ -289,7 +289,7 @@ void MainWindow::createCpuLoadChart() {
     axisY->setGridLineColor(QColor("#3d3d3d"));
     axisX->setLabelsBrush(QBrush(QColor("white")));
     axisY->setLabelsBrush(QBrush(QColor("white")));
-    axisY->setLabelFormat(QString("%d\%"));
+    axisY->setLabelFormat(QString("%d%%"));
     axisX->setLabelsVisible(false);
     chart->addAxis(axisX, Qt::AlignBottom);
     chart->addAxis(axisY, Qt::AlignRight);
