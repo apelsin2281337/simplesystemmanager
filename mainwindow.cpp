@@ -1,0 +1,368 @@
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QDebug>
+#include <QFont>
+#include "resource_monitor.hpp"
+#include <QTimer>
+
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+    , prevCpuStats(Resmon::get_cpu_usage())
+{
+    ui->setupUi(this);
+
+
+    servicesModel = new QStandardItemModel(this);
+    servicesModel->setColumnCount(3);
+    servicesModel->setHorizontalHeaderLabels({"Service", "Description", "Status"});
+
+
+    servicesProxyModel = new QSortFilterProxyModel(this);
+    servicesProxyModel->setSourceModel(servicesModel);
+    servicesProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+
+    ui->servicesTable->setModel(servicesProxyModel);
+    ui->servicesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->servicesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    connect(ui->searchServicesLineEdit, &QLineEdit::textChanged,
+            this, &MainWindow::on_searchServicesTextChanged);
+
+
+
+    tempFilesModel = new QStandardItemModel(this);
+    tempFilesModel->setColumnCount(1);
+    tempFilesModel->setHorizontalHeaderLabels({"File Path"});
+    ui->tempFilesTable->setModel(tempFilesModel);
+    ui->tempFilesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tempFilesTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+    prevCpuStats = Resmon::get_cpu_usage();
+
+    resourceTimer = new QTimer(this);
+    connect(resourceTimer, &QTimer::timeout, this, [this]() {
+        updateCpuUsage();
+        updateSwapUsage();
+        updateRamUsage();
+        updateDiskUsage();
+    });
+    //частота обновления в миллисекундах это вот эта циферка
+    resourceTimer->start(1);
+
+
+    populateServicesTable();
+
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::populateServicesTable()
+{
+    servicesModel->removeRows(0, servicesModel->rowCount());
+    auto services = get_services();
+    QFont font;
+
+    for (const auto& service : services) {
+        QList<QStandardItem*> rowItems;
+
+        QStandardItem *nameItem = new QStandardItem(QString::fromStdString(service.name));
+        QStandardItem *descItem = new QStandardItem(QString::fromStdString(service.description));
+        QStandardItem *statusItem = new QStandardItem(QString::fromStdString(service.status));
+
+
+
+        if (service.status == "active") {
+            statusItem->setForeground(QBrush(Qt::green));
+        } else if (service.status == "failed") {
+            statusItem->setForeground(QBrush(Qt::red));
+        }
+
+        rowItems << nameItem << descItem << statusItem;
+        servicesModel->appendRow(rowItems);
+
+
+        for (auto& item : rowItems){
+            item->setFont(font);
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        }
+    }
+}
+
+void MainWindow::on_scanTempFilesButton_clicked()
+{
+    tempFilesModel->removeRows(0, tempFilesModel->rowCount());
+
+    try {
+        std::filesystem::path home = get_home_directory();
+        std::vector<std::filesystem::path> tempfiles_paths = {
+            "/tmp",
+            "/var/tmp",
+            home / ".cache",
+            home / ".local/share/Trash"
+        };
+
+        for (auto& path : tempfiles_paths) {
+            auto folder_contents = get_recursive_folder_content(path);
+
+            if (!folder_contents) {
+                showError(QString::fromStdString(folder_contents.error()));
+                continue;
+            }
+
+            for (const auto& file : *folder_contents) {
+                tempFilesModel->appendRow(new QStandardItem(QString::fromStdString(file.string())));
+            }
+        }
+
+        showInfo(QString("Found %1 temporary files").arg(tempFilesModel->rowCount()));
+    }
+    catch (const std::exception& e) {
+        showError(QString("Error: ") + e.what());
+    }
+}
+
+
+
+void MainWindow::on_startServiceButton_clicked()
+{
+    QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
+    if (selected.isEmpty()) {
+        showError("Please select a service first");
+        return;
+    }
+
+    QString serviceName = servicesModel->item(selected.first().row(), 0)->text();
+    if (serviceName.isEmpty()) {
+        showError("Invalid service selected");
+        return;
+    }
+
+    int result = start_service(serviceName.toStdString());
+    if (result == 0) {
+        showInfo("Service started successfully");
+        populateServicesTable();
+    } else {
+        showError("Failed to start service");
+    }
+}
+
+void MainWindow::on_stopServiceButton_clicked()
+{
+    QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
+    if (selected.isEmpty()) {
+        showError("Please select a service first");
+        return;
+    }
+
+    QString serviceName = servicesModel->item(selected.first().row(), 0)->text();
+    if (serviceName.isEmpty()) {
+        showError("Invalid service selected");
+        return;
+    }
+
+    int result = stop_service(serviceName.toStdString());
+    if (result == 0) {
+        showInfo("Service stopped successfully");
+        populateServicesTable();
+    } else {
+        showError("Failed to stop service");
+    }
+}
+
+void MainWindow::on_enableServiceButton_clicked()
+{
+    QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
+    if (selected.isEmpty()) {
+        showError("Please select a service first");
+        return;
+    }
+
+    QString serviceName = servicesModel->item(selected.first().row(), 0)->text();
+    if (serviceName.isEmpty()) {
+        showError("Invalid service selected");
+        return;
+    }
+
+    int result = enable_service(serviceName.toStdString());
+    if (result == 0) {
+        showInfo("Service enabled successfully");
+        populateServicesTable();
+    } else {
+        showError("Failed to enable service");
+    }
+}
+
+void MainWindow::on_disableServiceButton_clicked()
+{
+    QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
+    if (selected.isEmpty()) {
+        showError("Please select a service first");
+        return;
+    }
+
+    QString serviceName = servicesModel->item(selected.first().row(), 0)->text();
+    if (serviceName.isEmpty()) {
+        showError("Invalid service selected");
+        return;
+    }
+
+    int result = disable_service(serviceName.toStdString());
+    if (result == 0) {
+        showInfo("Service disabled successfully");
+        populateServicesTable();
+    } else {
+        showError("Failed to disable service");
+    }
+}
+
+void MainWindow::on_refreshServicesButton_clicked()
+{
+    populateServicesTable();
+    showInfo("Service list refreshed");
+}
+
+void MainWindow::on_deleteSelectedFilesButton_clicked()
+{
+    QModelIndexList selected = ui->tempFilesTable->selectionModel()->selectedRows();
+    if (selected.isEmpty()) {
+        showError("Please select files to delete");
+        return;
+    }
+
+    int deletedCount = 0;
+    int failedCount = 0;
+
+    for (const QModelIndex &index : selected) {
+        QString filePath = tempFilesModel->item(index.row())->text();
+        try {
+            if (std::filesystem::remove(filePath.toStdString())) {
+                deletedCount++;
+            } else {
+                failedCount++;
+            }
+        } catch (const std::exception&) {
+            failedCount++;
+        }
+    }
+
+    // Remove deleted files from the model
+    for (int i = tempFilesModel->rowCount() - 1; i >= 0; --i) {
+        if (ui->tempFilesTable->selectionModel()->isRowSelected(i, QModelIndex())) {
+            tempFilesModel->removeRow(i);
+        }
+    }
+
+    showInfo(QString("Deleted %1 files, failed to delete %2 files").arg(deletedCount).arg(failedCount));
+}
+
+void MainWindow::on_searchServicesTextChanged(const QString &text)
+{
+    // Filter on all columns (0=Service, 1=Description, 2=Status)
+    servicesProxyModel->setFilterKeyColumn(-1); // -1 means all columns
+
+    // Set the filter text
+    servicesProxyModel->setFilterFixedString(text);
+}
+
+void MainWindow::createCpuLoadChart() {
+    chart = new QChart();
+    series = new QSplineSeries();
+    chart->addSeries(series);
+    chart->setTitle("CPU Load Graph");
+    chart->setTitleBrush(QBrush(QColor("white")));
+    axisX = new QValueAxis();
+    axisY = new QValueAxis();
+    axisY->setRange(0, 100);
+    axisX->setGridLineVisible(false);
+    axisY->setGridLineVisible(false);
+    axisX->setLabelsBrush(QBrush(QColor("white")));
+    axisY->setLabelsBrush(QBrush(QColor("white")));
+    axisX->setLabelsVisible(false);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    chart->addAxis(axisY, Qt::AlignLeft);
+
+    series->attachAxis(axisX);
+    series->attachAxis(axisY);
+
+    chart->setBackgroundBrush(Qt::NoBrush);
+    chart->setBackgroundVisible(false);
+    chart->legend()->hide();
+
+    chartView = new QChartView(chart);
+    ui->verticalLayout_10->addWidget(chartView);
+}
+
+void MainWindow::updateChart(double usage) {
+    static int x = 0;
+    series->append(x++, usage);
+
+    if (series->count() > 60) {
+        series->remove(0);
+    }
+
+    axisX->setRange(qMax(0, x-20), x);
+}
+
+void MainWindow::updateCpuUsage() {
+    Resmon::CPUStats current = Resmon::get_cpu_usage();
+    double usage = current.usage_percent(prevCpuStats);
+    prevCpuStats = current;
+
+    ui->cpuUsageBar->setValue(static_cast<int>(usage));
+    ui->cpuUsageLabel->setText(QString("%1%").arg(usage, 0, 'f', 1));
+
+    if (!chart) {
+        createCpuLoadChart();
+    }
+    updateChart(usage);
+}
+
+
+void MainWindow::updateRamUsage() {
+    Resmon::MemStats mem = Resmon::get_mem_usage();
+    double usage = mem.usage_percent();
+
+    ui->ramUsageBar->setValue(static_cast<int>(usage));
+    ui->ramUsageLabel->setText(QString("%1% (%2 MB / %3 MB)")
+        .arg(usage, 0, 'f', 1)
+        .arg((mem.total - mem.available) / (1024 * 1024))
+        .arg(mem.total / (1024 * 1024)));
+}
+
+void MainWindow::updateSwapUsage() {
+    Resmon::MemStats swap = Resmon::get_mem_usage();
+    double usage = swap.swap_usage_percent();
+
+    ui->swapUsageBar->setValue(static_cast<int>(usage));
+    ui->swapUsageLabel->setText(QString("%1% (%2 MB / %3 MB)")
+                                    .arg(usage, 0, 'f', 1)
+                                    .arg((swap.swaptotal - swap.swapfree) / (1024 * 1024))
+                                    .arg(swap.swaptotal / (1024 * 1024)));
+}
+
+void MainWindow::updateDiskUsage() {
+    Resmon::DiskStats disk = Resmon::get_disk_usage();
+    double usage = disk.usage_percent();
+
+    ui->diskUsageBar->setValue(static_cast<int>(usage));
+    ui->diskUsageLabel->setText(QString("%1% (%2 MB / %3 MB)")
+                                   .arg(usage, 0, 'f', 1)
+                                   .arg((disk.used) / (1024 * 1024))
+                                   .arg(disk.total / (1024 * 1024)));
+}
+
+void MainWindow::showError(const QString &message)
+{
+    QMessageBox::critical(this, "Error", message);
+}
+
+void MainWindow::showInfo(const QString &message)
+{
+    QMessageBox::information(this, "Information", message);
+}

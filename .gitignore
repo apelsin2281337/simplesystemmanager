@@ -1,0 +1,100 @@
+# Qt build artifacts
+build-*/
+*.pro.user
+*.pro.user.*
+*.autosave
+
+build/**
+
+# Compiled files
+*.o
+*.moc
+*.moc_*
+*.obj
+*.pch
+
+
+# Qt Creator files
+CMakeLists.txt.user*
+*.includes
+*.config
+*.creator
+*.files
+*.cflags
+*.cxxflags
+*.config
+
+# Executables
+*.exe
+*.app
+*.dll
+*.so
+*.dylib
+
+# Debug files
+*.debug
+*.ilk
+*.pdb
+
+# Release files
+*.release
+
+# QMake files
+Makefile
+*.make
+*.qmake.stash
+
+# Qt resource files
+qrc_*.cpp
+
+# Generated UI files
+ui_*.h
+
+# moc files
+moc_*.cpp
+
+# QML cache
+.qmlcache/
+
+# Shadow build directories
+build-*
+
+# macOS
+.DS_Store
+._*
+
+# Windows
+Thumbs.db
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+*.cmake
+
+# Visual Studio
+.vs/
+*.vcxproj*
+*.sln
+*.suo
+*.opensdf
+*.sdf
+
+# CLion
+.idea/
+cmake-build-*/
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Binaries and libraries
+*.a
+*.lib
+*.dylib
+*.so
+*.so.*
+SystemManager
+build/Desktop-Debug/SystemManager
+build/*
