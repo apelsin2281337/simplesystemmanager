@@ -1,4 +1,4 @@
-QT += core gui widgets charts  # Added 'charts' here
+QT += core gui widgets charts
 CONFIG += c++23 warn_on release dynamic
 TARGET = SystemManager
 TEMPLATE = app
