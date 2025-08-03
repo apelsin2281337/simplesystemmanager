@@ -280,17 +280,19 @@ void MainWindow::createCpuLoadChart() {
     series = new QSplineSeries();
     chart->addSeries(series);
     chart->setTitle("CPU Load Graph");
+    chart->setTitleFont(QFont("Ubuntu", 11));
     chart->setTitleBrush(QBrush(QColor("white")));
     axisX = new QValueAxis();
     axisY = new QValueAxis();
     axisY->setRange(0, 100);
     axisX->setGridLineVisible(false);
-    axisY->setGridLineVisible(false);
+    axisY->setGridLineColor(QColor("#3d3d3d"));
     axisX->setLabelsBrush(QBrush(QColor("white")));
     axisY->setLabelsBrush(QBrush(QColor("white")));
+    axisY->setLabelFormat(QString("%d\%"));
     axisX->setLabelsVisible(false);
     chart->addAxis(axisX, Qt::AlignBottom);
-    chart->addAxis(axisY, Qt::AlignLeft);
+    chart->addAxis(axisY, Qt::AlignRight);
 
     series->attachAxis(axisX);
     series->attachAxis(axisY);
@@ -321,7 +323,7 @@ void MainWindow::updateChart(double usage) {
     static int x = 0;
     series->append(x++, usage);
 
-    if (series->count() > 60) {
+    if (series->count() > xlim) {
         series->remove(0);
     }
 
