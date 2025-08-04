@@ -307,7 +307,7 @@ void MainWindow::createCpuLoadChart() {
 
 void MainWindow::updateChart(double usage) {
     static int x = 0;
-    const int xlim = 50;
+    const int xlim = 500;
     series->append(x++, usage);
 
     if (series->count() > xlim) {
