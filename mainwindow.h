@@ -12,6 +12,8 @@
 #include "services.hpp"
 #include "temp_files.hpp"
 #include "resource_monitor.hpp"
+#include "autostart.hpp"
+#include "addautostartdialog.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,18 +37,24 @@ private slots:
     void on_refreshServicesButton_clicked();
     void on_deleteSelectedFilesButton_clicked();
     void on_searchServicesTextChanged(const QString &text);
+    void on_addEntryButton_clicked();
+    void on_enableEntryButton_clicked();
+    void on_removeEntryButton_clicked();
+    void on_updateEntriesButton_clicked();
 
 private:
     Ui::MainWindow *ui;
     QStandardItemModel *servicesModel;
     QSortFilterProxyModel *servicesProxyModel;
     QStandardItemModel *tempFilesModel;
+    QStandardItemModel *autostartModel;
     QChart *chart = nullptr;
     QSplineSeries *series = nullptr;
     QValueAxis *axisX = nullptr;
     QValueAxis *axisY = nullptr;
     QChartView *chartView = nullptr;
     void populateServicesTable();
+    void populateAutostartTable();
     void showError(const QString &message);
     void showInfo(const QString &message);
     void updateCpuUsage();
@@ -59,6 +67,7 @@ private:
     Resmon::CPUStats prevCpuStats;
     QTimer *resourceTimer;
     QTimer* chartUpdateTimer;
+    QDialog *newEntryDialog;
 };
 
 #endif // MAINWINDOW_H

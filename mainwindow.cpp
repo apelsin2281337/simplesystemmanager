@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QFont>
+#include <QDialog>
 #include "resource_monitor.hpp"
 #include <QTimer>
 
@@ -26,7 +27,9 @@ MainWindow::MainWindow(QWidget *parent)
     servicesProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
     ui->servicesTable->setModel(servicesProxyModel);
-    ui->servicesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->servicesTable->setColumnWidth(0, 300);
+    ui->servicesTable->setColumnWidth(1, 338);
+    ui->servicesTable->setColumnWidth(2, 68);
     ui->servicesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     connect(ui->searchServicesLineEdit, &QLineEdit::textChanged,
             this, &MainWindow::on_searchServicesTextChanged);
@@ -39,6 +42,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tempFilesTable->setModel(tempFilesModel);
     ui->tempFilesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tempFilesTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+    autostartModel = new QStandardItemModel(this);
+    autostartModel->setColumnCount(3);
+    autostartModel->setHorizontalHeaderLabels({"Name", "Executable", "Comment"});
+
+    ui->autostartTable->setModel(autostartModel);
+    ui->autostartTable->setColumnWidth(0, 256);
+    ui->autostartTable->setColumnWidth(1, 255);
+    ui->autostartTable->setColumnWidth(2, 255);
+    ui->autostartTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     prevCpuStats = Resmon::get_cpu_usage();
 
@@ -62,6 +75,7 @@ MainWindow::MainWindow(QWidget *parent)
     chartUpdateTimer->start(150);
 
     populateServicesTable();
+    populateAutostartTable();
 }
 
 MainWindow::~MainWindow()
@@ -317,19 +331,6 @@ void MainWindow::updateChart(double usage) {
     axisX->setRange(x-xlim, x);
 }
 
-
-/*
-void MainWindow::updateChart(double usage) {
-    static int x = 0;
-    series->append(x++, usage);
-
-    if (series->count() > xlim) {
-        series->remove(0);
-    }
-
-    axisX->setRange(qMax(0, x-20), x);
-}
-*/
 void MainWindow::updateCpuUsage() {
     Resmon::CPUStats current = Resmon::get_cpu_usage();
     double usage = current.usage_percent(prevCpuStats);
@@ -371,6 +372,107 @@ void MainWindow::updateDiskUsage() {
                                    .arg(usage, 0, 'f', 1)
                                    .arg((disk.used) / (1024 * 1024))
                                    .arg(disk.total / (1024 * 1024)));
+}
+
+void MainWindow::populateAutostartTable(){
+
+    autostartModel->removeRows(0, autostartModel->rowCount());
+    std::vector<std::string> entries;
+    entries = AutostartManager::listAutostartEntries();
+    for (auto& entry : entries){
+        QList<QStandardItem*> rowItems;
+        auto info = AutostartManager::getAutostartEntryInfo(entry);
+        QStandardItem *nameItem = new QStandardItem(QString::fromStdString(info["Name"]));
+        QStandardItem *execItem = new QStandardItem(QString::fromStdString(info["Exec"]));
+        QStandardItem *commentItem = new QStandardItem(QString::fromStdString(info["Comment"]));
+
+        rowItems << nameItem << execItem << commentItem;
+        autostartModel->appendRow(rowItems);
+    }
+}
+
+void MainWindow::on_addEntryButton_clicked(){
+    AddAutostartDialog dialog(this);
+    dialog.exec();
+    QString name = dialog.getName();
+    QString exec = dialog.getExec();
+    QString comment = dialog.getComment();
+
+    if (name.isEmpty() || exec.isEmpty()) {
+        showError("Name and Executable fields are required");
+        return;
+    }
+    bool success = AutostartManager::addAutostartEntry(
+        name.toStdString(),
+        exec.toStdString(),
+        comment.toStdString());
+
+    if (success){
+        showInfo(QString("Entry %1 has been added successfully").arg(name));
+        populateAutostartTable();
+    }
+    else{
+        showError(QString("Entry %1 has not been added").arg(name));
+    }
+}
+
+void MainWindow::on_removeEntryButton_clicked(){
+    QModelIndexList selected = ui->autostartTable->selectionModel()->selectedRows();
+    if (selected.isEmpty()){
+        showError("Please select an entry first!");
+        return;
+    }
+    QString name = autostartModel->item(selected.first().row(), 0)->text();
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Confirm Removal",
+                                  QString("Are you sure you want to remove '%1'?").arg(name),
+                                  QMessageBox::Yes|QMessageBox::No);
+
+    if (reply == QMessageBox::Yes){
+        bool success = AutostartManager::removeAutostartEntry(name.toStdString());
+        if (success) {
+            showInfo(QString("Entry %1 removed successfully").arg(name));
+            populateAutostartTable();
+        } else {
+            showError(QString("Failed to remove autostart entry %1").arg(name));
+        }
+    }
+
+}
+
+void MainWindow::on_enableEntryButton_clicked(){
+    QModelIndexList selected = ui->autostartTable->selectionModel()->selectedRows();
+    if (selected.isEmpty()){
+        showError("Please select an entry first!");
+        return;
+    }
+    QString name = autostartModel->item(selected.first().row(), 0)->text();
+    auto info = AutostartManager::getAutostartEntryInfo(name.toStdString());
+    QString status = QString::fromStdString(info["Status"]);
+    bool statusBool = (QString::fromStdString(info["Status"]).toLower() == "true");
+    if (statusBool){
+        bool success = AutostartManager::setAutostartEntryEnabledStatus(name.toStdString(), false);
+        if (success){
+            showInfo(QString("Entry %1 has been disabled!").arg(name));
+        }
+        else{
+            showError("Error Occured");
+        }
+    }
+    else{
+        bool success = AutostartManager::setAutostartEntryEnabledStatus(name.toStdString(), true);
+        if(success){
+            showInfo(QString("Entry %1 has been enabled!").arg(name));
+        }
+        else{
+            showError("Error Occured");
+        }
+    }
+}
+
+void MainWindow::on_updateEntriesButton_clicked(){
+    populateAutostartTable();
+    showInfo("Autostart Entries has been reloaded!");
 }
 
 void MainWindow::showError(const QString &message)

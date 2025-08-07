@@ -4,16 +4,20 @@ TARGET = SystemManager
 TEMPLATE = app
 
 SOURCES += \
+    addautostartdialog.cpp \
     main.cpp \
     mainwindow.cpp \
     services.cpp \
-    temp_files.cpp
+    temp_files.cpp \
+    autostart.cpp
 
 HEADERS += \
+    addautostartdialog.hpp \
     mainwindow.h \
     resource_monitor.hpp \
     services.hpp \
-    temp_files.hpp
+    temp_files.hpp \
+    autostart.hpp
 
 FORMS += \
     mainwindow.ui
