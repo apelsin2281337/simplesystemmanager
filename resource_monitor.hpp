@@ -16,7 +16,7 @@ private:
         std::vector<std::string> stats;
 
         if (file.is_open()) {
-            getline(file, line); // First line is overall CPU stats
+            getline(file, line);
             std::istringstream iss(line);
             std::string token;
             while (iss >> token) {
@@ -118,7 +118,7 @@ public:
         auto stats = get_mem_stats();
         MemStats result;
         if (stats.size() >= 5) {
-            result.total = std::stoull(stats[0]) * 1024; // Convert from kB to bytes
+            result.total = std::stoull(stats[0]) * 1024;
             result.free = std::stoull(stats[1]) * 1024;
             result.available = std::stoull(stats[2]) * 1024;
             result.swaptotal = std::stoull(stats[3]) * 1024;
