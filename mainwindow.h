@@ -9,6 +9,7 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QSplineSeries>
 #include <QtCharts/QValueAxis>
+#include <QTranslator>
 #include "services.hpp"
 #include "temp_files.hpp"
 #include "resource_monitor.hpp"
@@ -43,6 +44,7 @@ private slots:
     void on_updateEntriesButton_clicked();
     void on_selectAllFilesButton_clicked();
     void on_clearSelectedFilesButton_clicked();
+    void onLanguageChanged(int index);
 
 private:
     Ui::MainWindow *ui;
@@ -70,6 +72,8 @@ private:
     QTimer *resourceTimer;
     QTimer* chartUpdateTimer;
     QDialog *newEntryDialog;
+    QTranslator *translator;
+    QTranslator *m_translator;
 };
 
 #endif // MAINWINDOW_H

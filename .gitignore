@@ -5,6 +5,9 @@ build-*/
 *.autosave
 
 build/**
+build.sh
+*.json
+translations/*.ts
 
 # Compiled files
 *.o

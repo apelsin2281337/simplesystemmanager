@@ -22,6 +22,12 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
+TRANSLATIONS += \
+    translations/qtguiinterface_en_US.ts \
+    translations/qtguiinterface_ru_RU.ts
+
+RESOURCES += translations.qrc
+
 # Проверка ОС для systemd
 linux {
     LIBS += -lsystemd
@@ -36,3 +42,6 @@ isEqual(QT_MAJOR_VERSION, 6) {
 
 # Отключение предупреждений
 QMAKE_CXXFLAGS += -Wno-unused-parameter
+
+RESOURCES += \
+    translations.qrc

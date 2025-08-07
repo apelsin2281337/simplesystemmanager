@@ -7,19 +7,29 @@
 #include <QDialog>
 #include "resource_monitor.hpp"
 #include <QTimer>
+#include <QDebug>
 
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , prevCpuStats(Resmon::get_cpu_usage())
+    , m_translator(new QTranslator(this))
 {
+
     ui->setupUi(this);
+    ui->languageComboBox->addItem("English", "en");
+    ui->languageComboBox->addItem("Русский", "ru");
+    connect(
+        ui->languageComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,&MainWindow::onLanguageChanged
+    );
+
+    ui->languageComboBox->setCurrentIndex(0);
 
 
     servicesModel = new QStandardItemModel(this);
     servicesModel->setColumnCount(3);
-    servicesModel->setHorizontalHeaderLabels({"Service", "Description", "Status"});
+    servicesModel->setHorizontalHeaderLabels({tr("Service"), tr("Description"), tr("Status")});
 
 
     servicesProxyModel = new QSortFilterProxyModel(this);
@@ -38,14 +48,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     tempFilesModel = new QStandardItemModel(this);
     tempFilesModel->setColumnCount(1);
-    tempFilesModel->setHorizontalHeaderLabels({"File Path"});
+    tempFilesModel->setHorizontalHeaderLabels({tr("File Path")});
     ui->tempFilesTable->setModel(tempFilesModel);
     ui->tempFilesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tempFilesTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     autostartModel = new QStandardItemModel(this);
     autostartModel->setColumnCount(3);
-    autostartModel->setHorizontalHeaderLabels({"Name", "Executable", "Comment"});
+    autostartModel->setHorizontalHeaderLabels({tr("Name"), tr("Executable"), tr("Comment")});
 
     ui->autostartTable->setModel(autostartModel);
     ui->autostartTable->setColumnWidth(0, 256);
@@ -141,10 +151,10 @@ void MainWindow::on_scanTempFilesButton_clicked()
             }
         }
 
-        showInfo(QString("Found %1 temporary files").arg(tempFilesModel->rowCount()));
+        showInfo(tr("Found %1 temporary files").arg(tempFilesModel->rowCount()));
     }
     catch (const std::exception& e) {
-        showError(QString("Error: ") + e.what());
+        showError(tr("Error: ") + e.what());
     }
 }
 
@@ -154,22 +164,22 @@ void MainWindow::on_startServiceButton_clicked()
 {
     QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        showError("Please select a service first");
+        showError(tr("Please select a service first"));
         return;
     }
 
     QString serviceName = servicesModel->item(selected.first().row(), 0)->text();
     if (serviceName.isEmpty()) {
-        showError("Invalid service selected");
+        showError(tr("Invalid service selected"));
         return;
     }
 
     int result = start_service(serviceName.toStdString());
     if (result == 0) {
-        showInfo("Service started successfully");
+        showInfo(tr("Service started successfully"));
         populateServicesTable();
     } else {
-        showError("Failed to start service");
+        showError(tr("Failed to start service"));
     }
 }
 
@@ -177,22 +187,22 @@ void MainWindow::on_stopServiceButton_clicked()
 {
     QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        showError("Please select a service first");
+        showError(tr("Please select a service first"));
         return;
     }
 
     QString serviceName = servicesModel->item(selected.first().row(), 0)->text();
     if (serviceName.isEmpty()) {
-        showError("Invalid service selected");
+        showError(tr("Invalid service selected"));
         return;
     }
 
     int result = stop_service(serviceName.toStdString());
     if (result == 0) {
-        showInfo("Service stopped successfully");
+        showInfo(tr("Service stopped successfully"));
         populateServicesTable();
     } else {
-        showError("Failed to stop service");
+        showError(tr("Failed to stop service"));
     }
 }
 
@@ -200,22 +210,22 @@ void MainWindow::on_enableServiceButton_clicked()
 {
     QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        showError("Please select a service first");
+        showError(tr("Please select a service first"));
         return;
     }
 
     QString serviceName = servicesModel->item(selected.first().row(), 0)->text();
     if (serviceName.isEmpty()) {
-        showError("Invalid service selected");
+        showError(tr("Invalid service selected"));
         return;
     }
 
     int result = enable_service(serviceName.toStdString());
     if (result == 0) {
-        showInfo("Service enabled successfully");
+        showInfo(tr("Service enabled successfully"));
         populateServicesTable();
     } else {
-        showError("Failed to enable service");
+        showError(tr("Failed to enable service"));
     }
 }
 
@@ -223,29 +233,29 @@ void MainWindow::on_disableServiceButton_clicked()
 {
     QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        showError("Please select a service first");
+        showError(tr("Please select a service first"));
         return;
     }
 
     QString serviceName = servicesModel->item(selected.first().row(), 0)->text();
     if (serviceName.isEmpty()) {
-        showError("Invalid service selected");
+        showError(tr("Invalid service selected"));
         return;
     }
 
     int result = disable_service(serviceName.toStdString());
     if (result == 0) {
-        showInfo("Service disabled successfully");
+        showInfo(("Service disabled successfully"));
         populateServicesTable();
     } else {
-        showError("Failed to disable service");
+        showError(tr("Failed to disable service"));
     }
 }
 
 void MainWindow::on_refreshServicesButton_clicked()
 {
     populateServicesTable();
-    showInfo("Service list refreshed");
+    showInfo(tr("Service list refreshed"));
 }
 
 void MainWindow::on_selectAllFilesButton_clicked(){
@@ -262,7 +272,7 @@ void MainWindow::on_deleteSelectedFilesButton_clicked()
 {
     QModelIndexList selected = ui->tempFilesTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        showError("Please select files to delete");
+        showError(tr("Please select files to delete"));
         return;
     }
 
@@ -289,7 +299,7 @@ void MainWindow::on_deleteSelectedFilesButton_clicked()
         }
     }
 
-    showInfo(QString("Deleted %1 files, failed to delete %2 files").arg(deletedCount).arg(failedCount));
+    showInfo(tr("Deleted %1 files, failed to delete %2 files").arg(deletedCount).arg(failedCount));
 }
 
 void MainWindow::on_searchServicesTextChanged(const QString &text)
@@ -303,7 +313,7 @@ void MainWindow::createCpuLoadChart() {
     chart = new QChart();
     series = new QSplineSeries();
     chart->addSeries(series);
-    chart->setTitle("CPU Load Graph");
+    chart->setTitle(tr("CPU Load Graph"));
     chart->setTitleFont(QFont("Ubuntu", 11));
     chart->setTitleBrush(QBrush(QColor("white")));
     axisX = new QValueAxis();
@@ -347,7 +357,7 @@ void MainWindow::updateCpuUsage() {
     prevCpuStats = current;
 
     ui->cpuUsageBar->setValue(static_cast<int>(usage));
-    ui->cpuUsageLabel->setText(QString("%1%").arg(usage, 0, 'f', 1));
+    ui->cpuUsageLabel->setText(tr("%1%").arg(usage, 0, 'f', 1));
 }
 
 
@@ -356,7 +366,7 @@ void MainWindow::updateRamUsage() {
     double usage = mem.usage_percent();
 
     ui->ramUsageBar->setValue(static_cast<int>(usage));
-    ui->ramUsageLabel->setText(QString("%1% (%2 MB / %3 MB)")
+    ui->ramUsageLabel->setText(tr("%1% (%2 MB / %3 MB)")
         .arg(usage, 0, 'f', 1)
         .arg((mem.total - mem.available) / (1024 * 1024))
         .arg(mem.total / (1024 * 1024)));
@@ -367,7 +377,7 @@ void MainWindow::updateSwapUsage() {
     double usage = swap.swap_usage_percent();
 
     ui->swapUsageBar->setValue(static_cast<int>(usage));
-    ui->swapUsageLabel->setText(QString("%1% (%2 MB / %3 MB)")
+    ui->swapUsageLabel->setText(tr("%1% (%2 MB / %3 MB)")
                                     .arg(usage, 0, 'f', 1)
                                     .arg((swap.swaptotal - swap.swapfree) / (1024 * 1024))
                                     .arg(swap.swaptotal / (1024 * 1024)));
@@ -378,7 +388,7 @@ void MainWindow::updateDiskUsage() {
     double usage = disk.usage_percent();
 
     ui->diskUsageBar->setValue(static_cast<int>(usage));
-    ui->diskUsageLabel->setText(QString("%1% (%2 MB / %3 MB)")
+    ui->diskUsageLabel->setText(tr("%1% (%2 MB / %3 MB)")
                                    .arg(usage, 0, 'f', 1)
                                    .arg((disk.used) / (1024 * 1024))
                                    .arg(disk.total / (1024 * 1024)));
@@ -409,7 +419,7 @@ void MainWindow::on_addEntryButton_clicked(){
     QString comment = dialog.getComment();
 
     if (name.isEmpty() || exec.isEmpty()) {
-        showError("Name and Executable fields are required");
+        showError(tr("Name and Executable fields are required"));
         return;
     }
     bool success = AutostartManager::addAutostartEntry(
@@ -418,33 +428,33 @@ void MainWindow::on_addEntryButton_clicked(){
         comment.toStdString());
 
     if (success){
-        showInfo(QString("Entry %1 has been added successfully").arg(name));
+        showInfo(tr("Entry %1 has been added successfully").arg(name));
         populateAutostartTable();
     }
     else{
-        showError(QString("Entry %1 has not been added").arg(name));
+        showError(tr("Entry %1 has not been added").arg(name));
     }
 }
 
 void MainWindow::on_removeEntryButton_clicked(){
     QModelIndexList selected = ui->autostartTable->selectionModel()->selectedRows();
     if (selected.isEmpty()){
-        showError("Please select an entry first!");
+        showError(tr("Please select an entry first!"));
         return;
     }
     QString name = autostartModel->item(selected.first().row(), 0)->text();
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Confirm Removal",
-                                  QString("Are you sure you want to remove '%1'?").arg(name),
+    reply = QMessageBox::question(this, tr("Confirm Removal"),
+                                  tr("Are you sure you want to remove '%1'?").arg(name),
                                   QMessageBox::Yes|QMessageBox::No);
 
     if (reply == QMessageBox::Yes){
         bool success = AutostartManager::removeAutostartEntry(name.toStdString());
         if (success) {
-            showInfo(QString("Entry %1 removed successfully").arg(name));
+            showInfo(tr("Entry %1 removed successfully").arg(name));
             populateAutostartTable();
         } else {
-            showError(QString("Failed to remove autostart entry %1").arg(name));
+            showError(tr("Failed to remove autostart entry %1").arg(name));
         }
     }
 
@@ -453,7 +463,7 @@ void MainWindow::on_removeEntryButton_clicked(){
 void MainWindow::on_enableEntryButton_clicked(){
     QModelIndexList selected = ui->autostartTable->selectionModel()->selectedRows();
     if (selected.isEmpty()){
-        showError("Please select an entry first!");
+        showError(tr("Please select an entry first!"));
         return;
     }
     QString name = autostartModel->item(selected.first().row(), 0)->text();
@@ -463,34 +473,64 @@ void MainWindow::on_enableEntryButton_clicked(){
     if (statusBool){
         bool success = AutostartManager::setAutostartEntryEnabledStatus(name.toStdString(), false);
         if (success){
-            showInfo(QString("Entry %1 has been disabled!").arg(name));
+            showInfo(tr("Entry %1 has been disabled!").arg(name));
         }
         else{
-            showError("Error Occured");
+            showError(tr("Error Occured"));
         }
     }
     else{
         bool success = AutostartManager::setAutostartEntryEnabledStatus(name.toStdString(), true);
         if(success){
-            showInfo(QString("Entry %1 has been enabled!").arg(name));
+            showInfo(tr("Entry %1 has been enabled!").arg(name));
         }
         else{
-            showError("Error Occured");
+            showError(tr("Error Occured"));
         }
     }
 }
 
 void MainWindow::on_updateEntriesButton_clicked(){
     populateAutostartTable();
-    showInfo("Autostart Entries has been reloaded!");
+    showInfo(tr("Autostart Entries has been reloaded!"));
+}
+
+void MainWindow::onLanguageChanged(int index)
+{
+    QString languageCode = ui->languageComboBox->itemData(index).toString();
+
+
+    QString localeCode = (languageCode == "en") ? "en_US" : "ru_RU";
+
+    qApp->removeTranslator(m_translator);
+    delete m_translator;
+    m_translator = new QTranslator(this);
+
+    QString translationFile = QString(":translations/qtguiinterface_%1.qm").arg(localeCode);
+    std::cerr << "Loading translation file: " << translationFile.toStdString() << std::endl;
+
+    if (m_translator->load(translationFile)) {
+        qApp->installTranslator(m_translator);
+        std::cerr << "Successfully loaded translation for:" << localeCode.toStdString()<< std::endl;
+    } else {
+        std::cerr << "Failed to load translation for:" << localeCode.toStdString()<< std::endl;
+    }
+
+    ui->retranslateUi(this);
+
+
+    servicesModel->setHorizontalHeaderLabels({tr("Service"), tr("Description"), tr("Status")});
+    autostartModel->setHorizontalHeaderLabels({tr("Name"), tr("Executable"), tr("Comment")});
+    tempFilesModel->setHorizontalHeaderLabels({tr("File Path")});
+    chart->setTitle(tr("CPU Load Graph"));
 }
 
 void MainWindow::showError(const QString &message)
 {
-    QMessageBox::critical(this, "Error", message);
+    QMessageBox::critical(this, tr("Error"), message);
 }
 
 void MainWindow::showInfo(const QString &message)
 {
-    QMessageBox::information(this, "Information", message);
+    QMessageBox::information(this, tr("Information"), message);
 }
