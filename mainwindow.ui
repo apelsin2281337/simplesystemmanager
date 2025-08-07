@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabResources">
        <attribute name="title">
@@ -236,6 +236,20 @@
            <widget class="QPushButton" name="scanTempFilesButton">
             <property name="text">
              <string>Scan for Temporary Files</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="selectAllFilesButton">
+            <property name="text">
+             <string>Select All</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="clearSelectedFilesButton">
+            <property name="text">
+             <string>Clear Selection</string>
             </property>
            </widget>
           </item>

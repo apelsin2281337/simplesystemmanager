@@ -41,6 +41,8 @@ private slots:
     void on_enableEntryButton_clicked();
     void on_removeEntryButton_clicked();
     void on_updateEntriesButton_clicked();
+    void on_selectAllFilesButton_clicked();
+    void on_clearSelectedFilesButton_clicked();
 
 private:
     Ui::MainWindow *ui;

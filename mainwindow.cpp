@@ -248,6 +248,16 @@ void MainWindow::on_refreshServicesButton_clicked()
     showInfo("Service list refreshed");
 }
 
+void MainWindow::on_selectAllFilesButton_clicked(){
+    ui->tempFilesTable->selectAll();
+    QModelIndexList selectedIndexes = ui->tempFilesTable->selectionModel()->selectedIndexes();
+}
+
+void MainWindow::on_clearSelectedFilesButton_clicked(){
+    ui->tempFilesTable->clearSelection();
+    QModelIndexList selectedIndexes = ui->tempFilesTable->selectionModel()->selectedIndexes();
+}
+
 void MainWindow::on_deleteSelectedFilesButton_clicked()
 {
     QModelIndexList selected = ui->tempFilesTable->selectionModel()->selectedRows();
