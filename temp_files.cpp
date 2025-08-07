@@ -2,11 +2,6 @@
 
 
 std::expected<std::vector<std::filesystem::path>, std::string> get_recursive_folder_content(const std::filesystem::path& folder_path) {
-    /**
-     * @brief Returns paths of all files and directories in the passed folder recursively
-     * @param folder_path Path to the directory to scan
-     * @return std::expected containing vector of paths or error message
-     */
     std::vector<std::filesystem::path> result;
 
     if (!std::filesystem::exists(folder_path)) {
