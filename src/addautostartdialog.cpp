@@ -1,4 +1,4 @@
-#include <addautostartdialog.hpp>
+#include <include/addautostartdialog.hpp>
 
 AddAutostartDialog::AddAutostartDialog(QWidget *parent) : QDialog(parent){
     setWindowTitle(tr("Add Autostart Entry!"));

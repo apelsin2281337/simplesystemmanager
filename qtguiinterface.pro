@@ -4,20 +4,20 @@ TARGET = SystemManager
 TEMPLATE = app
 
 SOURCES += \
-    addautostartdialog.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    services.cpp \
-    temp_files.cpp \
-    autostart.cpp
+    src/addautostartdialog.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/services.cpp \
+    src/temp_files.cpp \
+    src/autostart.cpp
 
 HEADERS += \
-    addautostartdialog.hpp \
-    mainwindow.h \
-    resource_monitor.hpp \
-    services.hpp \
-    temp_files.hpp \
-    autostart.hpp
+    include/addautostartdialog.hpp \
+    include/mainwindow.h \
+    include/resource_monitor.hpp \
+    include/services.hpp \
+    include/temp_files.hpp \
+    include/autostart.hpp
 
 FORMS += \
     mainwindow.ui
@@ -26,7 +26,7 @@ TRANSLATIONS += \
     translations/qtguiinterface_en_US.ts \
     translations/qtguiinterface_ru_RU.ts
 
-RESOURCES += translations.qrc
+RESOURCES += resources/translations.qrc
 
 # Проверка ОС для systemd
 linux {
@@ -41,7 +41,7 @@ isEqual(QT_MAJOR_VERSION, 6) {
 }
 
 # Отключение предупреждений
-QMAKE_CXXFLAGS += -Wno-unused-parameter
+#QMAKE_CXXFLAGS += -Wno-unused-parameter
 
 RESOURCES += \
-    translations.qrc
+    resources/translations.qrc

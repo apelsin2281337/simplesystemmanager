@@ -1,11 +1,11 @@
-#include "mainwindow.h"
+#include "include/mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDebug>
 #include <QFont>
 #include <QDialog>
-#include "resource_monitor.hpp"
+#include "include/resource_monitor.hpp"
 #include <QTimer>
 #include <QDebug>
 

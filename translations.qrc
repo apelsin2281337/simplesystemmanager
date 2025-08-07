@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>translations/qtguiinterface_ru_RU.qm</file>
-        <file>translations/qtguiinterface_en_US.qm</file>
-    </qresource>
-</RCC>
