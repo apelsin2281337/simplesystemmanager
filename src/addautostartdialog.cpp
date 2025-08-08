@@ -18,4 +18,6 @@ AddAutostartDialog::AddAutostartDialog(QWidget *parent) : QDialog(parent){
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
     setFixedSize(400, 200);
+    logL("Add Dialog Window Invoked!");
+
 }

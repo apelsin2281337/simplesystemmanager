@@ -5,6 +5,8 @@
 #include <vector>
 #include <unordered_map>
 #include <regex>
+#include <QDebug>
+#include "include/logger.hpp"
 
 class AutostartManager{
 public:

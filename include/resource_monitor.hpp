@@ -7,6 +7,7 @@
 #include <sstream>
 #include <unistd.h>
 #include <sys/statvfs.h>
+#include "include/logger.hpp"
 
 class Resmon {
 private:
@@ -22,6 +23,8 @@ private:
             while (iss >> token) {
                 if (token != "cpu") stats.push_back(token);
             }
+        } else {
+            logE("Failed to open /proc/stat");
         }
         return stats;
     }
@@ -41,6 +44,8 @@ private:
                     stats.push_back(value);
                 }
             }
+        } else {
+            logE("Failed to open /proc/meminfo");
         }
         return stats;
     }
@@ -97,6 +102,9 @@ public:
             result.total = vfs.f_blocks * vfs.f_frsize;
             result.free = vfs.f_bfree * vfs.f_frsize;
             result.used = result.total - result.free;
+            //logL(std::format("Disk stats: total={} bytes, free={} bytes", result.total, result.free));
+        } else {
+            logE("Failed to get disk stats using statvfs");
         }
         return result;
     }
@@ -110,6 +118,10 @@ public:
             result.nice = std::stoull(stats[1]);
             result.system = std::stoull(stats[2]);
             result.idle = std::stoull(stats[3]);
+            //logL(std::format("CPU stats: user={}, nice={}, system={}, idle={}",
+            //                 result.user, result.nice, result.system, result.idle));
+        } else {
+            logE("Invalid CPU stats format from /proc/stat");
         }
         return result;
     }
@@ -123,6 +135,10 @@ public:
             result.available = std::stoull(stats[2]) * 1024;
             result.swaptotal = std::stoull(stats[3]) * 1024;
             result.swapfree = std::stoull(stats[4]) * 1024;
+            //logL(std::format("Memory stats: total={} bytes, available={} bytes",
+            //                result.total, result.available));
+        } else {
+            logE("Invalid memory stats format from /proc/meminfo");
         }
         return result;
     }

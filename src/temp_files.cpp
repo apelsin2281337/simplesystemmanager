@@ -5,12 +5,15 @@ std::expected<std::vector<std::filesystem::path>, std::string> get_recursive_fol
     std::vector<std::filesystem::path> result;
 
     if (!std::filesystem::exists(folder_path)) {
+        logE(std::format("Folder does not exist: {}", folder_path.string()));
         return std::unexpected("Folder does not exist");
     }
     if (!std::filesystem::is_directory(folder_path)) {
+        logE(std::format("Path is not a directory: {}", folder_path.string()));
         return std::unexpected("Path is not a directory");
     }
     if (std::filesystem::is_empty(folder_path)) {
+        logL(std::format("Folder is empty: {}", folder_path.string()));
         return std::unexpected("Folder is empty");
     }
 
@@ -18,7 +21,9 @@ std::expected<std::vector<std::filesystem::path>, std::string> get_recursive_fol
         for (const auto& entry : std::filesystem::recursive_directory_iterator(folder_path)) {
             result.push_back(entry.path());
         }
+        logL(std::format("Found {} files in {}", result.size(), folder_path.string()));
     } catch (const std::filesystem::filesystem_error& e) {
+        logE(std::format("Filesystem error in {}: {}", folder_path.string(), e.what()));
         return std::unexpected(std::string("Filesystem error: ") + e.what());
     }
 
@@ -28,18 +33,21 @@ std::expected<std::vector<std::filesystem::path>, std::string> get_recursive_fol
 std::filesystem::path get_home_directory() {
     if (const char* sudo_user = std::getenv("SUDO_USER")) {
         if (struct passwd* pw = getpwnam(sudo_user)) {
+            logL(std::format("Using home directory of SUDO_USER: {}", pw->pw_dir));
             return pw->pw_dir;
         }
     }
 
     if (const char* home = std::getenv("HOME")) {
+        logL(std::format("Using HOME environment variable: {}", home));
         return home;
     }
 
     if (struct passwd* pw = getpwuid(getuid())) {
+        logL(std::format("Using home directory from getpwuid: {}", pw->pw_dir));
         return pw->pw_dir;
     }
 
+    logF("Failed to determine home directory");
     throw std::runtime_error("Failed to determine home directory");
 }
-

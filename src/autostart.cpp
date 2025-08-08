@@ -1,15 +1,18 @@
-    #include "include/autostart.hpp"
+#include "include/autostart.hpp"
 
-
+std::filesystem::path autostart_dir_= "/etc/xdg/autostart";
 
 
 bool AutostartManager::addAutostartEntry(const std::string& name, const std::string& exec, const std::string& comment, bool isEnabled){
-    std::filesystem::path autostart_dir_= "/etc/xdg/autostart";
+
+
     std::filesystem::path dotdesktopFilePath = autostart_dir_ / (name + ".desktop");
     std::ofstream file(dotdesktopFilePath);
     if (!file.is_open()){
-        throw std::runtime_error("well that didnt work");
+        logE(std::format("Autostart: File {0} did not open successfully. it probably does not exist", dotdesktopFilePath.string()));
+        throw std::runtime_error(std::format("File {0} did not open successfully. it probably does not exist", dotdesktopFilePath.string()));
         return false;
+
     }
     
     file << "[Desktop Entry]\n"
@@ -18,29 +21,33 @@ bool AutostartManager::addAutostartEntry(const std::string& name, const std::str
     << "Comment=" << comment << "\n"
     << "Exec=" << exec << "\n"
     << "X-GNOME-Autostart-enabled=" << (isEnabled ? "true" : "false") << "\n";
-    return  true;
     file.close();
-    }
+    logL(std::format("Autostart: File {0} has been added successfully", dotdesktopFilePath.string()));
+    return true;
+}
 
 bool AutostartManager::removeAutostartEntry(const std::string& name){
-        std::filesystem::path autostart_dir_= "/etc/xdg/autostart";
         std::filesystem::path desktop_file = autostart_dir_ / (name + ".desktop");
         if (!std::filesystem::exists(desktop_file)) {
+            logE(std::format("Autostart: File {0} did not open successfully. it probably does not exist", desktop_file.string()));
             return false;
+
         }
         
         try {
+            logL(std::format("Autostart: Trying to remove file {0}", desktop_file.string()));
             return std::filesystem::remove(desktop_file);
+            logL("Success!");
         } catch (const std::filesystem::filesystem_error& e) {
-            std::cerr << "Error removing file (may need root privileges): " << e.what() << "\n";
+            logE(std::format("Autostart: File {0} removal failed", desktop_file.string()));
             return false;
         }
     }
 
 bool AutostartManager::setAutostartEntryEnabledStatus(const std::string& name, bool status){
-    std::filesystem::path autostart_dir_= "/etc/xdg/autostart";
     std::filesystem::path desktop_file = autostart_dir_ / (name + ".desktop");
     if (!std::filesystem::exists(desktop_file)) {
+        logE(std::format("Autostart: File {0} did not open successfully. it probably does not exist", desktop_file.string()));
         return false;
     }
     std::ifstream file(desktop_file);
@@ -68,42 +75,43 @@ bool AutostartManager::setAutostartEntryEnabledStatus(const std::string& name, b
 
     std::ofstream out_file(desktop_file);
     if (!out_file.is_open()) {
-        std::cerr << "well that didnt work\n";
+        logE(std::format("Autostart: File {0} did not open successfully. it probably does not exist", desktop_file.string()));
         return false;
     }
 
     for (const auto& l : lines) {
         out_file << l << "\n";
     }
+    logL(std::format("Autostart: Status {0} has been set for file {1}", status, desktop_file.string()));
     out_file.close();
     return true;
 }
 
 std::vector<std::string> AutostartManager::listAutostartEntries(){
-    std::filesystem::path autostart_dir_= "/etc/xdg/autostart";
     std::vector<std::string> entries;
 
     for (const auto& entry : std::filesystem::directory_iterator(autostart_dir_)) {
         if (entry.path().extension() == ".desktop") {
-            entries.push_back(entry.path().stem().string());
+            std::string entryPath = entry.path().stem().string();
+            entries.push_back(entryPath);
+            logL(std::format("Autostart: Autostart Entry {0} has been found and added", entryPath));
         }
     }
     return entries;
 }
 
 std::unordered_map<std::string, std::string> AutostartManager::getAutostartEntryInfo(const std::string& name){
-    std::filesystem::path autostart_dir_= "/etc/xdg/autostart";
     std::unordered_map<std::string, std::string> entryInfo;
     std::filesystem::path dotDesktopFile = autostart_dir_ / (name + ".desktop");
 
     if (!std::filesystem::exists(dotDesktopFile)) {
-        std::cerr << "Error: File does not exist: " << dotDesktopFile << "\n";
+        logE(std::format("Autostart: {0} does not exist", dotDesktopFile.string()));
         return entryInfo;
     }
 
     std::ifstream file(dotDesktopFile);
     if (!file.is_open()) {
-        std::cerr << "Error: Failed to open file: " << dotDesktopFile << "\n";
+        logE(std::format("Autostart: Failed to open {0}", dotDesktopFile.string()));
         return entryInfo;
     }
 

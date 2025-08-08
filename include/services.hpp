@@ -2,6 +2,7 @@
 #include <systemd/sd-bus.h>
 #include <iostream>
 #include <vector>
+#include "include/logger.hpp"
 
 struct ServiceInfo{
     std::string name;

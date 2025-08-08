@@ -5,6 +5,7 @@ TEMPLATE = app
 
 SOURCES += \
     src/addautostartdialog.cpp \
+    src/logger.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/services.cpp \
@@ -17,7 +18,8 @@ HEADERS += \
     include/resource_monitor.hpp \
     include/services.hpp \
     include/temp_files.hpp \
-    include/autostart.hpp
+    include/autostart.hpp \
+    include/logger.hpp
 
 FORMS += \
     mainwindow.ui

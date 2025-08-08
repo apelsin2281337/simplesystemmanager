@@ -3,6 +3,7 @@
 #include <QLineEdit>
 #include <QFormLayout>
 #include <QDialogButtonBox>
+#include "include/logger.hpp"
 
 class AddAutostartDialog : public QDialog{
     Q_OBJECT

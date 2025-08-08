@@ -4,17 +4,30 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QHeaderView>
+#include <QTimer>
+#include <QDebug>
 #include <QAbstractItemView>
 #include <QSortFilterProxyModel>
 #include <QtCharts/QChartView>
 #include <QtCharts/QSplineSeries>
 #include <QtCharts/QValueAxis>
 #include <QTranslator>
-#include "services.hpp"
-#include "temp_files.hpp"
-#include "resource_monitor.hpp"
-#include "autostart.hpp"
-#include "addautostartdialog.hpp"
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QFont>
+#include <QDialog>
+#include <QFile>
+#include <QTextStream>
+#include <QtGlobal>
+
+#include "include/services.hpp"
+#include "include/temp_files.hpp"
+#include "include/autostart.hpp"
+#include "include/addautostartdialog.hpp"
+#include "include/mainwindow.h"
+#include "ui_mainwindow.h"
+#include "include/logger.hpp"
+#include "include/resource_monitor.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,6 +41,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
 
 private slots:
     void on_scanTempFilesButton_clicked();
@@ -75,5 +89,7 @@ private:
     QTranslator *translator;
     QTranslator *m_translator;
 };
+
+
 
 #endif // MAINWINDOW_H
