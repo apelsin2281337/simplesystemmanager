@@ -10,15 +10,13 @@ MainWindow::MainWindow(QWidget *parent)
     logL("Initializing MainWindow");
     ui->setupUi(this);
 
-    // Language setup
-    ui->languageComboBox->addItem("English", "en");
-    ui->languageComboBox->addItem("Русский", "ru");
-    ui->languageComboBox->addItem("Polski (wip)", "pl");
+    ui->languageComboBox->addItem("English", "en_US");
+    ui->languageComboBox->addItem("Русский", "ru_RU");
+    ui->languageComboBox->addItem("Polski", "pl_PL");
     connect(ui->languageComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onLanguageChanged);
     ui->languageComboBox->setCurrentIndex(0);
 
-    // Services table setup
     servicesModel = new QStandardItemModel(this);
     servicesModel->setColumnCount(3);
     servicesModel->setHorizontalHeaderLabels({tr("Service"), tr("Description"), tr("Status")});
@@ -35,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->searchServicesLineEdit, &QLineEdit::textChanged,
             this, &MainWindow::on_searchServicesTextChanged);
 
-    // Temp files table setup
     tempFilesModel = new QStandardItemModel(this);
     tempFilesModel->setColumnCount(1);
     tempFilesModel->setHorizontalHeaderLabels({tr("File Path")});
@@ -43,7 +40,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tempFilesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tempFilesTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    // Autostart table setup
     autostartModel = new QStandardItemModel(this);
     autostartModel->setColumnCount(3);
     autostartModel->setHorizontalHeaderLabels({tr("Name"), tr("Executable"), tr("Comment")});
@@ -53,7 +49,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->autostartTable->setColumnWidth(2, 255);
     ui->autostartTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    // Resource monitoring setup
     prevCpuStats = Resmon::get_cpu_usage();
     resourceTimer = new QTimer(this);
     connect(resourceTimer, &QTimer::timeout, this, [this]() {
@@ -64,7 +59,6 @@ MainWindow::MainWindow(QWidget *parent)
     });
     resourceTimer->start(1000);
 
-    // CPU chart setup
     createCpuLoadChart();
     chartUpdateTimer = new QTimer(this);
     connect(chartUpdateTimer, &QTimer::timeout, this, [this]() {
@@ -75,7 +69,6 @@ MainWindow::MainWindow(QWidget *parent)
     });
     chartUpdateTimer->start(150);
 
-    // Populate tables
     populateServicesTable();
     populateAutostartTable();
     logL("MainWindow initialization completed");
@@ -549,19 +542,8 @@ void MainWindow::updateDiskUsage()
 
 void MainWindow::onLanguageChanged(int index)
 {
-    QString languageCode = ui->languageComboBox->itemData(index).toString();
-    QString localeCode;
+    QString localeCode = ui->languageComboBox->itemData(index).toString();
 
-
-    if (languageCode == "en") {
-        localeCode = "en_US";
-    } else if (languageCode == "ru") {
-        localeCode = "ru_RU";
-    } else if (languageCode == "pl") {
-        localeCode = "pl_PL";
-    } else {
-        localeCode = "en_US";
-    }
 
     logL(std::format("Changing language to: {}", localeCode.toStdString()));
 
