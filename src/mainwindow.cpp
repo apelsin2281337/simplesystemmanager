@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Language setup
     ui->languageComboBox->addItem("English", "en");
     ui->languageComboBox->addItem("Русский", "ru");
+    ui->languageComboBox->addItem("Polski (wip)", "pl");
     connect(ui->languageComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onLanguageChanged);
     ui->languageComboBox->setCurrentIndex(0);
@@ -549,7 +550,18 @@ void MainWindow::updateDiskUsage()
 void MainWindow::onLanguageChanged(int index)
 {
     QString languageCode = ui->languageComboBox->itemData(index).toString();
-    QString localeCode = (languageCode == "en") ? "en_US" : "ru_RU";
+    QString localeCode;
+
+
+    if (languageCode == "en") {
+        localeCode = "en_US";
+    } else if (languageCode == "ru") {
+        localeCode = "ru_RU";
+    } else if (languageCode == "pl") {
+        localeCode = "pl_PL";
+    } else {
+        localeCode = "en_US";
+    }
 
     logL(std::format("Changing language to: {}", localeCode.toStdString()));
 
