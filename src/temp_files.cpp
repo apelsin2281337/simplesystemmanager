@@ -5,11 +5,11 @@ std::expected<std::vector<std::filesystem::path>, std::string> get_recursive_fol
     std::vector<std::filesystem::path> result;
 
     if (!std::filesystem::exists(folder_path)) {
-        logE(std::format("Temp files: Folder does not exist: {}", folder_path.string()));
+        logE(std::format("Folder does not exist: {}", folder_path.string()));
         return std::unexpected("Folder does not exist");
     }
     if (!std::filesystem::is_directory(folder_path)) {
-        logE(std::format("Temp files: Path is not a directory: {}", folder_path.string()));
+        logE(std::format("Path is not a directory: {}", folder_path.string()));
         return std::unexpected("Path is not a directory");
     }
     if (std::filesystem::is_empty(folder_path)) {
@@ -23,7 +23,7 @@ std::expected<std::vector<std::filesystem::path>, std::string> get_recursive_fol
         }
         logL(std::format("Temp files: Found {} files in {}", result.size(), folder_path.string()));
     } catch (const std::filesystem::filesystem_error& e) {
-        logE(std::format("Temp files: Filesystem error in {}: {}", folder_path.string(), e.what()));
+        logE(std::format("Filesystem error in {}: {}", folder_path.string(), e.what()));
         return std::unexpected(std::string("Filesystem error: ") + e.what());
     }
 

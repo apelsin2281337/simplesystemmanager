@@ -4,7 +4,7 @@ Logger::Logger() {
     auto now = std::chrono::system_clock::now();
     auto now_local = std::chrono::current_zone()->to_local(now);
 
-    std::string timeString = std::format("{:%d-%m-%Y_%H-%M-%S}", now_local);
+    std::string timeString = std::format("{:%d-%m-%Y}", now_local);
     fileName_ = std::format("logs/Log_{}.txt", timeString);
 
     std::filesystem::create_directory("logs");
