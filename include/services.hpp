@@ -17,3 +17,4 @@ int start_service(const std::string& unit_name);
 int stop_service(const std::string& unit_name);
 int enable_service(const std::string& unit_name);
 int disable_service(const std::string &unit_name);
+bool is_service_enabled(const std::string& unit_name);

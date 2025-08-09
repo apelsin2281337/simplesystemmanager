@@ -9,14 +9,14 @@
 #define INTERFACE   "org.freedesktop.systemd1.Manager"
 
 int start_service(const std::string& unit_name) {
-    logL(std::format("Attempting to start service: {}", unit_name));
+    logL(std::format("Services: Services:  Attempting to start service: {}", unit_name));
     sd_bus *bus = nullptr;
     sd_bus_error error = SD_BUS_ERROR_NULL;
     sd_bus_message *reply = nullptr;
     int r = sd_bus_open_system(&bus);
 
     if (r < 0) {
-        logE(std::format("Failed to connect to system bus: {}", strerror(-r)));
+        logE(std::format("Services: Failed to connect to system bus: {}", strerror(-r)));
         return r;
     }
 
@@ -32,7 +32,7 @@ int start_service(const std::string& unit_name) {
                            "replace");
 
     if (r < 0) {
-        logE(std::format("Failed to start service {}: {}", unit_name, error.message));
+        logE(std::format("Services: Failed to start service {}: {}", unit_name, error.message));
         sd_bus_error_free(&error);
         sd_bus_unref(bus);
         return r;
@@ -42,19 +42,19 @@ int start_service(const std::string& unit_name) {
     sd_bus_message_unref(reply);
     sd_bus_unref(bus);
 
-    logL(std::format("Successfully started service: {}", unit_name));
+    logL(std::format("Services: Successfully started service: {}", unit_name));
     return 0;
 }
 
 int stop_service(const std::string& unit_name) {
-    logL(std::format("Attempting to stop service: {}", unit_name));
+    logL(std::format("Services: Attempting to stop service: {}", unit_name));
     sd_bus *bus = nullptr;
     sd_bus_error error = SD_BUS_ERROR_NULL;
     sd_bus_message *reply = nullptr;
     int r = sd_bus_open_system(&bus);
 
     if (r < 0) {
-        logE(std::format("Failed to connect to system bus: {}", strerror(-r)));
+        logE(std::format("Services: Failed to connect to system bus: {}", strerror(-r)));
         return r;
     }
 
@@ -69,7 +69,7 @@ int stop_service(const std::string& unit_name) {
                            unit_name.c_str(),
                            "replace");
     if (r < 0) {
-        logE(std::format("Failed to stop service {}: {}", unit_name, error.message));
+        logE(std::format("Services: Failed to stop service {}: {}", unit_name, error.message));
         sd_bus_error_free(&error);
         sd_bus_unref(bus);
         return r;
@@ -79,19 +79,19 @@ int stop_service(const std::string& unit_name) {
     sd_bus_message_unref(reply);
     sd_bus_unref(bus);
 
-    logL(std::format("Successfully stopped service: {}", unit_name));
+    logL(std::format("Services: Successfully stopped service: {}", unit_name));
     return 0;
 }
 
 int enable_service(const std::string& unit_name) {
-    logL(std::format("Attempting to enable service: {}", unit_name));
+    logL(std::format("Services: Attempting to enable service: {}", unit_name));
     sd_bus *bus = nullptr;
     sd_bus_error error = SD_BUS_ERROR_NULL;
     sd_bus_message *reply = nullptr;
     int r = sd_bus_open_system(&bus);
 
     if (r < 0) {
-        logE(std::format("Failed to connect to system bus: {}", strerror(-r)));
+        logE(std::format("Services: Failed to connect to system bus: {}", strerror(-r)));
         return r;
     }
 
@@ -109,7 +109,7 @@ int enable_service(const std::string& unit_name) {
                            true);
 
     if (r < 0) {
-        logE(std::format("Failed to enable service {}: {}", unit_name, error.message));
+        logE(std::format("Services: Failed to enable service {}: {}", unit_name, error.message));
         sd_bus_error_free(&error);
         sd_bus_unref(bus);
         return r;
@@ -125,19 +125,19 @@ int enable_service(const std::string& unit_name) {
                            "");
 
     if (r < 0) {
-        logE(std::format("Warning: Failed to reload systemd: {}", error.message));
+        logE(std::format("Services: Warning: Failed to reload systemd: {}", error.message));
     }
 
     sd_bus_error_free(&error);
     if (reply) sd_bus_message_unref(reply);
     sd_bus_unref(bus);
 
-    logL(std::format("Successfully enabled service: {}", unit_name));
+    logL(std::format("Services: Successfully enabled service: {}", unit_name));
     return 0;
 }
 
 int disable_service(const std::string &unit_name) {
-    logL(std::format("Attempting to disable service: {}", unit_name));
+    logL(std::format("Services: Attempting to disable service: {}", unit_name));
     sd_bus_error error = SD_BUS_ERROR_NULL;
     sd_bus_message *reply = nullptr;
     sd_bus *bus = nullptr;
@@ -145,7 +145,7 @@ int disable_service(const std::string &unit_name) {
 
     r = sd_bus_open_system(&bus);
     if (r < 0) {
-        logE(std::format("Failed to connect to system bus: {}", strerror(-r)));
+        logE(std::format("Services: Failed to connect to system bus: {}", strerror(-r)));
         return r;
     }
 
@@ -162,7 +162,7 @@ int disable_service(const std::string &unit_name) {
                            false);
 
     if (r < 0) {
-        logE(std::format("Failed to disable service {}: {}", unit_name, error.message));
+        logE(std::format("Services: Failed to disable service {}: {}", unit_name, error.message));
         sd_bus_error_free(&error);
         sd_bus_unref(bus);
         return r;
@@ -178,14 +178,14 @@ int disable_service(const std::string &unit_name) {
                            "");
 
     if (r < 0) {
-        logE(std::format("Warning: Failed to reload systemd: {}", error.message));
+        logE(std::format("Services: Warning: Failed to reload systemd: {}", error.message));
     }
 
     sd_bus_error_free(&error);
     if (reply) sd_bus_message_unref(reply);
     sd_bus_unref(bus);
 
-    logL(std::format("Successfully disabled service: {}", unit_name));
+    logL(std::format("Services: Successfully disabled service: {}", unit_name));
     return 0;
 }
 
@@ -198,7 +198,7 @@ std::vector<ServiceInfo> get_services() {
 
     int r = sd_bus_open_system(&bus);
     if (r < 0) {
-        logE(std::format("Failed to connect to system bus: {}", strerror(-r)));
+        logE(std::format("Services: Failed to connect to system bus: {}", strerror(-r)));
         return services;
     }
 
@@ -212,7 +212,7 @@ std::vector<ServiceInfo> get_services() {
                            "");
 
     if (r < 0) {
-        logE(std::format("Failed to call ListUnits: {}", error.message));
+        logE(std::format("Services: Failed to call ListUnits: {}", error.message));
         sd_bus_error_free(&error);
         sd_bus_unref(bus);
         return services;
@@ -220,7 +220,7 @@ std::vector<ServiceInfo> get_services() {
 
     r = sd_bus_message_enter_container(reply, 'a', "(ssssssouso)");
     if (r < 0) {
-        logE(std::format("Failed to enter array container: {}", strerror(-r)));
+        logE(std::format("Services: Failed to enter array container: {}", strerror(-r)));
         sd_bus_message_unref(reply);
         sd_bus_unref(bus);
         return services;
@@ -237,7 +237,7 @@ std::vector<ServiceInfo> get_services() {
                                 &active_state, nullptr, nullptr,
                                 nullptr, nullptr, nullptr, nullptr);
         if (r < 0) {
-            logE(std::format("Failed to read message: {}", strerror(-r)));
+            logE(std::format("Services: Failed to read message: {}", strerror(-r)));
             sd_bus_message_exit_container(reply);
             break;
         }
@@ -256,6 +256,53 @@ std::vector<ServiceInfo> get_services() {
     sd_bus_message_unref(reply);
     sd_bus_unref(bus);
 
-    logL(std::format("Found {} services", services.size()));
+    logL(std::format("Services: Services: Found {0} services", services.size()));
     return services;
+}
+
+bool is_service_enabled(const std::string& unit_name) {
+    sd_bus *bus = nullptr;
+    sd_bus_error error = SD_BUS_ERROR_NULL;
+    sd_bus_message *reply = nullptr;
+    int r = sd_bus_open_system(&bus);
+
+    if (r < 0) {
+        logE(std::format("Services: Failed to connect to system bus: {0}", strerror(-r)));
+        return false;
+    }
+
+    r = sd_bus_call_method(bus,
+                           DESTINATION,
+                           PATH,
+                           INTERFACE,
+                           "GetUnitFileState",
+                           &error,
+                           &reply,
+                           "s",
+                           unit_name.c_str());
+
+    if (r < 0) {
+        logE(std::format("Services: Failed to get service {0} state: {1}", unit_name, error.message));
+        sd_bus_error_free(&error);
+        sd_bus_unref(bus);
+        return false;
+    }
+
+    const char *state = nullptr;
+    r = sd_bus_message_read(reply, "s", &state);
+    if (r < 0) {
+        logE(std::format("Services: Failed to parse service {0} state: {1}", unit_name, strerror(-r)));
+        sd_bus_error_free(&error);
+        sd_bus_message_unref(reply);
+        sd_bus_unref(bus);
+        return false;
+    }
+
+    bool is_active = (strcmp(state, "enabled") == 0 || strcmp(state, "static") == 0);
+
+    sd_bus_error_free(&error);
+    sd_bus_message_unref(reply);
+    sd_bus_unref(bus);
+    logL(std::format("Service {0} is enabled", unit_name));
+    return is_active;
 }

@@ -26,7 +26,8 @@ FORMS += \
 
 TRANSLATIONS += \
     translations/qtguiinterface_en_US.ts \
-    translations/qtguiinterface_ru_RU.ts
+    translations/qtguiinterface_ru_RU.ts \
+    translations/qtguiinterface_pl_PL.ts
 
 RESOURCES += resources/translations.qrc
 

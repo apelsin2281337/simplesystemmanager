@@ -89,14 +89,15 @@ bool AutostartManager::setAutostartEntryEnabledStatus(const std::string& name, b
 
 std::vector<std::string> AutostartManager::listAutostartEntries(){
     std::vector<std::string> entries;
-
+    size_t i = 0;
     for (const auto& entry : std::filesystem::directory_iterator(autostart_dir_)) {
         if (entry.path().extension() == ".desktop") {
             std::string entryPath = entry.path().stem().string();
             entries.push_back(entryPath);
-            logL(std::format("Autostart: Autostart Entry {0} has been found and added", entryPath));
+            i++;
         }
     }
+    logL(std::format("Autostart: {0} entries has been found", i));
     return entries;
 }
 

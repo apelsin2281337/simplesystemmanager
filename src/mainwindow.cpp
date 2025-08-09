@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     , prevCpuStats(Resmon::get_cpu_usage())
     , m_translator(new QTranslator(this))
 {
-    logL("Initializing MainWindow");
+    logL("MainWindow: Initializing MainWindow");
     ui->setupUi(this);
 
     ui->languageComboBox->addItem("English", "en_US");
@@ -67,23 +67,23 @@ MainWindow::MainWindow(QWidget *parent)
         prevCpuStats = current;
         updateChart(usage);
     });
-    chartUpdateTimer->start(150);
+    chartUpdateTimer->start(700);
 
     populateServicesTable();
     populateAutostartTable();
-    logL("MainWindow initialization completed");
+    logL("MainWindow: MainWindow initialization completed");
 }
 
 MainWindow::~MainWindow()
 {
-    logL("MainWindow destruction started");
+    logL("MainWindow: MainWindow destruction started");
     delete ui;
-    logL("MainWindow destroyed");
+    logL("MainWindow: MainWindow destroyed");
 }
 
 void MainWindow::populateServicesTable()
 {
-    logL("Populating services table");
+    logL("MainWindow: Populating services table");
     servicesModel->removeRows(0, servicesModel->rowCount());
     auto services = get_services();
     QFont font;
@@ -109,12 +109,12 @@ void MainWindow::populateServicesTable()
             item->setFlags(item->flags() & ~Qt::ItemIsEditable);
         }
     }
-    logL(std::format("Added {} services to table", services.size()));
+    logL(std::format("MainWindow: Added {} services to table", services.size()));
 }
 
 void MainWindow::populateAutostartTable()
 {
-    logL("Populating autostart table");
+    logL("MainWindow: Populating autostart table");
     autostartModel->removeRows(0, autostartModel->rowCount());
     std::vector<std::string> entries = AutostartManager::listAutostartEntries();
 
@@ -128,12 +128,12 @@ void MainWindow::populateAutostartTable()
         rowItems << nameItem << execItem << commentItem;
         autostartModel->appendRow(rowItems);
     }
-    logL(std::format("Added {} autostart entries to table", entries.size()));
+    logL(std::format("MainWindow: Added {} autostart entries to table", entries.size()));
 }
 
 void MainWindow::on_scanTempFilesButton_clicked()
 {
-    logL("Scanning for temporary files");
+    logL("MainWindow: Scanning for temporary files");
     tempFilesModel->removeRows(0, tempFilesModel->rowCount());
 
     try {
@@ -146,7 +146,7 @@ void MainWindow::on_scanTempFilesButton_clicked()
         };
 
         for (auto& path : tempfiles_paths) {
-            logL(std::format("Scanning directory: {}", path.string()));
+            logL(std::format("MainWindow: Scanning directory: {}", path.string()));
             auto folder_contents = get_recursive_folder_content(path);
 
             if (!folder_contents) {
@@ -161,10 +161,10 @@ void MainWindow::on_scanTempFilesButton_clicked()
         }
 
         showInfo(tr("Found %1 temporary files").arg(tempFilesModel->rowCount()));
-        logL(std::format("Found {} temporary files", tempFilesModel->rowCount()));
+        logL(std::format("MainWindow: Found {} temporary files", tempFilesModel->rowCount()));
     }
     catch (const std::exception& e) {
-        logE(std::format("Error scanning temp files: {}", e.what()));
+        logE(std::format("MainWindow: Error scanning temp files: {}", e.what()));
         showError(tr("Error: ") + e.what());
     }
 }
@@ -173,28 +173,36 @@ void MainWindow::on_startServiceButton_clicked()
 {
     QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        logE("No service selected for start");
+        logE("MainWindow: No service selected for start");
         showError(tr("Please select a service first"));
         return;
     }
 
     QModelIndex sourceIndex = servicesProxyModel->mapToSource(selected.first());
     QString serviceName = servicesModel->item(sourceIndex.row(), 0)->text();
-
+    QString serviceStatus = servicesModel->item(sourceIndex.row(), 2)->text();
+    int result = -1;
     if (serviceName.isEmpty()) {
-        logE("Invalid service selected for start");
+        logE("MainWindow: Invalid service selected for start");
         showError(tr("Invalid service selected"));
         return;
     }
 
-    logL(std::format("Starting service: {}", serviceName.toStdString()));
-    int result = start_service(serviceName.toStdString());
+    if (serviceStatus.compare("active", Qt::CaseInsensitive) != 0) {
+        logL(std::format("MainWindow: Starting service: {}", serviceName.toStdString()));
+        result = start_service(serviceName.toStdString());
+    }
+    else {
+        showInfo(tr("MainWindow: Service %1 is already started").arg(serviceName));
+        return;
+    }
+
     if (result == 0) {
-        logL(std::format("Successfully started service: {}", serviceName.toStdString()));
+        logL(std::format("MainWindow: Successfully started service: {}", serviceName.toStdString()));
         showInfo(tr("Service started successfully"));
         populateServicesTable();
     } else {
-        logE(std::format("Failed to start service: {}", serviceName.toStdString()));
+        logE(std::format("MainWindow: Failed to start service: {}", serviceName.toStdString()));
         showError(tr("Failed to start service"));
     }
 }
@@ -203,27 +211,36 @@ void MainWindow::on_stopServiceButton_clicked()
 {
     QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        logE("No service selected for stop");
+        logE("MainWindow: No service selected for stop");
         showError(tr("Please select a service first"));
         return;
     }
 
     QModelIndex sourceIndex = servicesProxyModel->mapToSource(selected.first());
     QString serviceName = servicesModel->item(sourceIndex.row(), 0)->text();
+    QString serviceStatus = servicesModel->item(sourceIndex.row(), 2)->text();
+    int result = -1;
     if (serviceName.isEmpty()) {
-        logE("Invalid service selected for stop");
+        logE("MainWindow: Invalid service selected for stop");
         showError(tr("Invalid service selected"));
         return;
     }
 
-    logL(std::format("Stopping service: {}", serviceName.toStdString()));
-    int result = stop_service(serviceName.toStdString());
+    if (serviceStatus.compare("active", Qt::CaseInsensitive) == 0) {
+        logL(std::format("MainWindow: Stopping service: {}", serviceName.toStdString()));
+        result = stop_service(serviceName.toStdString());
+    }
+    else {
+        showInfo(tr("MainWindow: Service %1 is already stopped").arg(serviceName));
+        return;
+    }
+
     if (result == 0) {
-        logL(std::format("Successfully stopped service: {}", serviceName.toStdString()));
+        logL(std::format("MainWindow: Successfully stopped service: {}", serviceName.toStdString()));
         showInfo(tr("Service stopped successfully"));
         populateServicesTable();
     } else {
-        logE(std::format("Failed to stop service: {}", serviceName.toStdString()));
+        logE(std::format("MainWindow: Failed to stop service: {}", serviceName.toStdString()));
         showError(tr("Failed to stop service"));
     }
 }
@@ -232,27 +249,34 @@ void MainWindow::on_enableServiceButton_clicked()
 {
     QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        logE("No service selected for enable");
+        logE("MainWindow: No service selected for enable");
         showError(tr("Please select a service first"));
         return;
     }
 
     QModelIndex sourceIndex = servicesProxyModel->mapToSource(selected.first());
     QString serviceName = servicesModel->item(sourceIndex.row(), 0)->text();
+    int result = -1;
     if (serviceName.isEmpty()) {
-        logE("Invalid service selected for enable");
+        logE("MainWindow: Invalid service selected for enable");
         showError(tr("Invalid service selected"));
         return;
     }
+    if (!is_service_enabled(serviceName.toStdString())) {
+        logL(std::format("MainWindow: Enabling service: {}", serviceName.toStdString()));
+        result = enable_service(serviceName.toStdString());
+    }
+    else {
+        showInfo(tr("MainWindow: Service %1 is already enabled").arg(serviceName));
+        return;
+    }
 
-    logL(std::format("Enabling service: {}", serviceName.toStdString()));
-    int result = enable_service(serviceName.toStdString());
     if (result == 0) {
-        logL(std::format("Successfully enabled service: {}", serviceName.toStdString()));
+        logL(std::format("MainWindow: Successfully enabled service: {}", serviceName.toStdString()));
         showInfo(tr("Service enabled successfully"));
         populateServicesTable();
     } else {
-        logE(std::format("Failed to enable service: {}", serviceName.toStdString()));
+        logE(std::format("MainWindow: Failed to enable service: {}", serviceName.toStdString()));
         showError(tr("Failed to enable service"));
     }
 }
@@ -261,47 +285,53 @@ void MainWindow::on_disableServiceButton_clicked()
 {
     QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        logE("No service selected for disable");
+        logE("MainWindow: No service selected for disable");
         showError(tr("Please select a service first"));
         return;
     }
 
     QModelIndex sourceIndex = servicesProxyModel->mapToSource(selected.first());
     QString serviceName = servicesModel->item(sourceIndex.row(), 0)->text();
+    int result = -1;
     if (serviceName.isEmpty()) {
-        logE("Invalid service selected for disable");
+        logE("MainWindow: Invalid service selected for disable");
         showError(tr("Invalid service selected"));
         return;
     }
-
-    logL(std::format("Disabling service: {}", serviceName.toStdString()));
-    int result = disable_service(serviceName.toStdString());
+    if (is_service_enabled(serviceName.toStdString())) {
+        logL(std::format("MainWindow: Disabling service: {}", serviceName.toStdString()));
+        result = disable_service(serviceName.toStdString());
+    }
+    else {
+        showInfo(tr("MainWindow: Service %1 is already disabled").arg(serviceName));
+        return;
+    }
     if (result == 0) {
-        logL(std::format("Successfully disabled service: {}", serviceName.toStdString()));
+        logL(std::format("MainWindow: Successfully disabled service: {}", serviceName.toStdString()));
         showInfo(tr("Service disabled successfully"));
         populateServicesTable();
     } else {
-        logE(std::format("Failed to disable service: {}", serviceName.toStdString()));
+        logE(std::format("MainWindow: Failed to disable service: {}", serviceName.toStdString()));
         showError(tr("Failed to disable service"));
     }
 }
 
 void MainWindow::on_refreshServicesButton_clicked()
 {
-    logL("Refreshing services table");
+    logL("MainWindow: Refreshing services table");
     populateServicesTable();
     showInfo(tr("Service list refreshed"));
 }
 
 void MainWindow::on_selectAllFilesButton_clicked()
 {
-    logL("Selecting all temporary files");
+    logL("MainWindow: Selecting all temporary files");
     ui->tempFilesTable->selectAll();
 }
 
 void MainWindow::on_clearSelectedFilesButton_clicked()
 {
-    logL("Clearing temporary files selection");
+    logL("MainWindow: Clearing temporary files selection");
     ui->tempFilesTable->clearSelection();
 }
 
@@ -309,12 +339,12 @@ void MainWindow::on_deleteSelectedFilesButton_clicked()
 {
     QModelIndexList selected = ui->tempFilesTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        logE("No files selected for deletion");
+        logE("MainWindow: No files selected for deletion");
         showError(tr("Please select files to delete"));
         return;
     }
 
-    logL(std::format("Attempting to delete {} files", selected.size()));
+    logL(std::format("MainWindow: Attempting to delete {} files", selected.size()));
     int deletedCount = 0;
     int failedCount = 0;
 
@@ -323,14 +353,14 @@ void MainWindow::on_deleteSelectedFilesButton_clicked()
         try {
             if (std::filesystem::remove(filePath.toStdString())) {
                 deletedCount++;
-                logL(std::format("Deleted file: {}", filePath.toStdString()));
+                logL(std::format("MainWindow: Deleted file: {}", filePath.toStdString()));
             } else {
                 failedCount++;
-                logE(std::format("Failed to delete file: {}", filePath.toStdString()));
+                logE(std::format("MainWindow: Failed to delete file: {}", filePath.toStdString()));
             }
         } catch (const std::exception& e) {
             failedCount++;
-            logE(std::format("Exception when deleting {}: {}", filePath.toStdString(), e.what()));
+            logE(std::format("MainWindow: Exception when deleting {}: {}", filePath.toStdString(), e.what()));
         }
     }
 
@@ -341,19 +371,19 @@ void MainWindow::on_deleteSelectedFilesButton_clicked()
     }
 
     showInfo(tr("Deleted %1 files, failed to delete %2 files").arg(deletedCount).arg(failedCount));
-    logL(std::format("Deletion completed: {} success, {} failures", deletedCount, failedCount));
+    logL(std::format("MainWindow: Deletion completed: {} success, {} failures", deletedCount, failedCount));
 }
 
 void MainWindow::on_searchServicesTextChanged(const QString &text)
 {
-    logL(std::format("Filtering services with text: {}", text.toStdString()));
+    logL(std::format("MainWindow: Filtering services with text: {}", text.toStdString()));
     servicesProxyModel->setFilterKeyColumn(-1);
     servicesProxyModel->setFilterFixedString(text);
 }
 
 void MainWindow::on_addEntryButton_clicked()
 {
-    logL("Showing add autostart entry dialog");
+    logL("MainWindow: Showing add autostart entry dialog");
     AddAutostartDialog dialog(this);
     dialog.exec();
     QString name = dialog.getName();
@@ -361,23 +391,23 @@ void MainWindow::on_addEntryButton_clicked()
     QString comment = dialog.getComment();
 
     if (name.isEmpty() || exec.isEmpty()) {
-        logE("Empty name or executable when adding autostart entry");
+        logE("MainWindow: MainWindow: Empty name or executable when adding autostart entry");
         showError(tr("Name and Executable fields are required"));
         return;
     }
 
-    logL(std::format("Adding autostart entry: {}", name.toStdString()));
+    logL(std::format("MainWindow: Adding autostart entry: {}", name.toStdString()));
     bool success = AutostartManager::addAutostartEntry(
         name.toStdString(),
         exec.toStdString(),
         comment.toStdString());
 
     if (success) {
-        logL(std::format("Successfully added autostart entry: {}", name.toStdString()));
+        logL(std::format("MainWindow: Successfully added autostart entry: {}", name.toStdString()));
         showInfo(tr("Entry %1 has been added successfully").arg(name));
         populateAutostartTable();
     } else {
-        logE(std::format("Failed to add autostart entry: {}", name.toStdString()));
+        logE(std::format("MainWindow: Failed to add autostart entry: {}", name.toStdString()));
         showError(tr("Entry %1 has not been added").arg(name));
     }
 }
@@ -386,7 +416,7 @@ void MainWindow::on_removeEntryButton_clicked()
 {
     QModelIndexList selected = ui->autostartTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        logE("No autostart entry selected for removal");
+        logE("MainWindow: MainWindow: No autostart entry selected for removal");
         showError(tr("Please select an entry first!"));
         return;
     }
@@ -398,18 +428,18 @@ void MainWindow::on_removeEntryButton_clicked()
                                   QMessageBox::Yes|QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
-        logL(std::format("Removing autostart entry: {}", name.toStdString()));
+        logL(std::format("MainWindow: Removing autostart entry: {}", name.toStdString()));
         bool success = AutostartManager::removeAutostartEntry(name.toStdString());
         if (success) {
-            logL(std::format("Successfully removed autostart entry: {}", name.toStdString()));
+            logL(std::format("MainWindow: Successfully removed autostart entry: {}", name.toStdString()));
             showInfo(tr("Entry %1 removed successfully").arg(name));
             populateAutostartTable();
         } else {
-            logE(std::format("Failed to remove autostart entry: {}", name.toStdString()));
+            logE(std::format("MainWindow: Failed to remove autostart entry: {}", name.toStdString()));
             showError(tr("Failed to remove autostart entry %1").arg(name));
         }
     } else {
-        logL("Autostart entry removal cancelled by user");
+        logL("MainWindow: MainWindow: Autostart entry removal cancelled by user");
     }
 }
 
@@ -417,7 +447,7 @@ void MainWindow::on_enableEntryButton_clicked()
 {
     QModelIndexList selected = ui->autostartTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        logE("No autostart entry selected for enable/disable");
+        logE("MainWindow: MainWindow: No autostart entry selected for enable/disable");
         showError(tr("Please select an entry first!"));
         return;
     }
@@ -426,28 +456,28 @@ void MainWindow::on_enableEntryButton_clicked()
     auto info = AutostartManager::getAutostartEntryInfo(name.toStdString());
     bool statusBool = (QString::fromStdString(info["Status"]).toLower() == "true");
 
-    logL(std::format("Setting autostart entry {} to {}", name.toStdString(), !statusBool));
+    logL(std::format("MainWindow: Setting autostart entry {} to {}", name.toStdString(), !statusBool));
     bool success = AutostartManager::setAutostartEntryEnabledStatus(name.toStdString(), !statusBool);
     if (success) {
-        logL(std::format("Successfully changed status for autostart entry: {}", name.toStdString()));
-        showInfo(tr("Entry %1 has been %2!").arg(name).arg(statusBool ? "disabled" : "enabled"));
+        logL(std::format("MainWindow: Successfully changed status for autostart entry: {}", name.toStdString()));
+        showInfo(tr("Entry %1 has been %2!").arg(name).arg(statusBool ? tr("disabled") : tr("enabled")));
         populateAutostartTable();
     } else {
-        logE(std::format("Failed to change status for autostart entry: {}", name.toStdString()));
+        logE(std::format("MainWindow: Failed to change status for autostart entry: {}", name.toStdString()));
         showError(tr("Error occurred"));
     }
 }
 
 void MainWindow::on_updateEntriesButton_clicked()
 {
-    logL("Refreshing autostart entries");
+    logL("MainWindow: Refreshing autostart entries");
     populateAutostartTable();
     showInfo(tr("Autostart Entries has been reloaded!"));
 }
 
 void MainWindow::createCpuLoadChart()
 {
-    logL("Creating CPU load chart");
+    logL("MainWindow: Creating CPU load chart");
     chart = new QChart();
     series = new QSplineSeries();
     chart->addSeries(series);
@@ -474,13 +504,14 @@ void MainWindow::createCpuLoadChart()
     chart->legend()->hide();
 
     chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
     ui->verticalLayout_10->addWidget(chartView);
 }
 
 void MainWindow::updateChart(double usage)
 {
     static int x = 0;
-    const int xlim = 500;
+    const int xlim = 50;
     series->append(x++, usage);
 
     if (series->count() > xlim) {
@@ -496,7 +527,7 @@ void MainWindow::updateCpuUsage()
     double usage = current.usage_percent(prevCpuStats);
     prevCpuStats = current;
 
-    //logL(std::format("CPU usage updated: {:.1f}%", usage));
+    //logL(std::format("MainWindow: CPU usage updated: {:.1f}%", usage));
     ui->cpuUsageBar->setValue(static_cast<int>(usage));
     ui->cpuUsageLabel->setText(tr("%1%").arg(usage, 0, 'f', 1));
 }
@@ -506,7 +537,7 @@ void MainWindow::updateRamUsage()
     Resmon::MemStats mem = Resmon::get_mem_usage();
     double usage = mem.usage_percent();
 
-    //logL(std::format("RAM usage updated: {:.1f}%", usage));
+    //logL(std::format("MainWindow: RAM usage updated: {:.1f}%", usage));
     ui->ramUsageBar->setValue(static_cast<int>(usage));
     ui->ramUsageLabel->setText(tr("%1% (%2 MB / %3 MB)")
                                    .arg(usage, 0, 'f', 1)
@@ -519,7 +550,7 @@ void MainWindow::updateSwapUsage()
     Resmon::MemStats swap = Resmon::get_mem_usage();
     double usage = swap.swap_usage_percent();
 
-    //logL(std::format("Swap usage updated: {:.1f}%", usage));
+    //logL(std::format("MainWindow: Swap usage updated: {:.1f}%", usage));
     ui->swapUsageBar->setValue(static_cast<int>(usage));
     ui->swapUsageLabel->setText(tr("%1% (%2 MB / %3 MB)")
                                     .arg(usage, 0, 'f', 1)
@@ -532,7 +563,7 @@ void MainWindow::updateDiskUsage()
     Resmon::DiskStats disk = Resmon::get_disk_usage();
     double usage = disk.usage_percent();
 
-    //logL(std::format("Disk usage updated: {:.1f}%", usage));
+    //logL(std::format("MainWindow: Disk usage updated: {:.1f}%", usage));
     ui->diskUsageBar->setValue(static_cast<int>(usage));
     ui->diskUsageLabel->setText(tr("%1% (%2 MB / %3 MB)")
                                     .arg(usage, 0, 'f', 1)
@@ -545,20 +576,20 @@ void MainWindow::onLanguageChanged(int index)
     QString localeCode = ui->languageComboBox->itemData(index).toString();
 
 
-    logL(std::format("Changing language to: {}", localeCode.toStdString()));
+    logL(std::format("MainWindow: Changing language to: {}", localeCode.toStdString()));
 
     qApp->removeTranslator(m_translator);
     delete m_translator;
     m_translator = new QTranslator(this);
 
     QString translationFile = QString(":translations/qtguiinterface_%1.qm").arg(localeCode);
-    logL(std::format("Loading translation file: {}", translationFile.toStdString()));
+    logL(std::format("MainWindow: Loading translation file: {}", translationFile.toStdString()));
 
     if (m_translator->load(translationFile)) {
         qApp->installTranslator(m_translator);
-        logL("Translation loaded successfully");
+        logL("MainWindow: Translation loaded successfully");
     } else {
-        logE("Failed to load translation");
+        logE("MainWindow: Failed to load translation");
     }
 
     ui->retranslateUi(this);
