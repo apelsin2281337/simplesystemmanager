@@ -5,50 +5,19 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <mutex>
+#include <thread>
 #include <unistd.h>
 #include <sys/statvfs.h>
+
+
 #include "include/logger.hpp"
 
 class Resmon {
 private:
-    static std::vector<std::string> get_cpu_stats() {
-        std::ifstream file("/proc/stat");
-        std::string line;
-        std::vector<std::string> stats;
-
-        if (file.is_open()) {
-            getline(file, line);
-            std::istringstream iss(line);
-            std::string token;
-            while (iss >> token) {
-                if (token != "cpu") stats.push_back(token);
-            }
-        } else {
-            logE("Failed to open /proc/stat");
-        }
-        return stats;
-    }
-
-    static std::vector<std::string> get_mem_stats() {
-        std::ifstream file("/proc/meminfo");
-        std::string line;
-        std::vector<std::string> stats;
-
-        if (file.is_open()) {
-            while (getline(file, line)) {
-                std::istringstream iss(line);
-                std::string key, value;
-                iss >> key >> value;
-                if (key == "MemTotal:" || key == "MemFree:" || key == "MemAvailable:" ||
-                    key == "SwapTotal:" || key == "SwapFree:") {
-                    stats.push_back(value);
-                }
-            }
-        } else {
-            logE("Failed to open /proc/meminfo");
-        }
-        return stats;
-    }
+    static std::mutex statsMutex_;
+    static std::vector<std::string> get_cpu_stats();
+    static std::vector<std::string> get_mem_stats();
 
 public:
     struct CPUStats {
@@ -94,52 +63,16 @@ public:
         }
     };
 
-    static DiskStats get_disk_usage() {
-        DiskStats result = {0, 0, 0};
-        struct statvfs vfs;
+    struct NetworkStats {
+        double rx_speed;
+        double tx_speed;
+    };
 
-        if (statvfs("/", &vfs) == 0) {
-            result.total = vfs.f_blocks * vfs.f_frsize;
-            result.free = vfs.f_bfree * vfs.f_frsize;
-            result.used = result.total - result.free;
-            //logL(std::format("Disk stats: total={} bytes, free={} bytes", result.total, result.free));
-        } else {
-            logE("Failed to get disk stats using statvfs");
-        }
-        return result;
-    }
+    static DiskStats get_disk_usage();
 
+    static NetworkStats get_internet_usage(const std::string& interface);
 
-    static CPUStats get_cpu_usage() {
-        auto stats = get_cpu_stats();
-        CPUStats result;
-        if (stats.size() >= 4) {
-            result.user = std::stoull(stats[0]);
-            result.nice = std::stoull(stats[1]);
-            result.system = std::stoull(stats[2]);
-            result.idle = std::stoull(stats[3]);
-            //logL(std::format("CPU stats: user={}, nice={}, system={}, idle={}",
-            //                 result.user, result.nice, result.system, result.idle));
-        } else {
-            logE("Invalid CPU stats format from /proc/stat");
-        }
-        return result;
-    }
+    static CPUStats get_cpu_usage();
 
-    static MemStats get_mem_usage() {
-        auto stats = get_mem_stats();
-        MemStats result;
-        if (stats.size() >= 5) {
-            result.total = std::stoull(stats[0]) * 1024;
-            result.free = std::stoull(stats[1]) * 1024;
-            result.available = std::stoull(stats[2]) * 1024;
-            result.swaptotal = std::stoull(stats[3]) * 1024;
-            result.swapfree = std::stoull(stats[4]) * 1024;
-            //logL(std::format("Memory stats: total={} bytes, available={} bytes",
-            //                result.total, result.available));
-        } else {
-            logE("Invalid memory stats format from /proc/meminfo");
-        }
-        return result;
-    }
+    static MemStats get_mem_usage();
 };

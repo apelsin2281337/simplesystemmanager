@@ -17,15 +17,17 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onLanguageChanged);
     ui->languageComboBox->setCurrentIndex(0);
 
-    servicesModel = new QStandardItemModel(this);
+    servicesModel = std::make_unique<QStandardItemModel>(this);
+    //servicesModel = new QStandardItemModel(this);
     servicesModel->setColumnCount(3);
     servicesModel->setHorizontalHeaderLabels({tr("Service"), tr("Description"), tr("Status")});
 
-    servicesProxyModel = new QSortFilterProxyModel(this);
-    servicesProxyModel->setSourceModel(servicesModel);
+    //servicesProxyModel = new QSortFilterProxyModel(this);
+    servicesProxyModel = std::make_unique<QSortFilterProxyModel>(this);
+    servicesProxyModel->setSourceModel(servicesModel.get());
     servicesProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
-    ui->servicesTable->setModel(servicesProxyModel);
+    ui->servicesTable->setModel(servicesProxyModel.get());
     ui->servicesTable->setColumnWidth(0, 300);
     ui->servicesTable->setColumnWidth(1, 338);
     ui->servicesTable->setColumnWidth(2, 68);
@@ -33,35 +35,39 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->searchServicesLineEdit, &QLineEdit::textChanged,
             this, &MainWindow::on_searchServicesTextChanged);
 
-    tempFilesModel = new QStandardItemModel(this);
+    //tempFilesModel = new QStandardItemModel(this);
+    tempFilesModel = std::make_unique<QStandardItemModel>(this);
     tempFilesModel->setColumnCount(1);
     tempFilesModel->setHorizontalHeaderLabels({tr("File Path")});
-    ui->tempFilesTable->setModel(tempFilesModel);
+    ui->tempFilesTable->setModel(tempFilesModel.get());
     ui->tempFilesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tempFilesTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    autostartModel = new QStandardItemModel(this);
+    //autostartModel = new QStandardItemModel(this);
+    autostartModel = std::make_unique<QStandardItemModel>(this);
     autostartModel->setColumnCount(3);
     autostartModel->setHorizontalHeaderLabels({tr("Name"), tr("Executable"), tr("Comment")});
-    ui->autostartTable->setModel(autostartModel);
+    ui->autostartTable->setModel(autostartModel.get());
     ui->autostartTable->setColumnWidth(0, 256);
     ui->autostartTable->setColumnWidth(1, 255);
     ui->autostartTable->setColumnWidth(2, 255);
     ui->autostartTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     prevCpuStats = Resmon::get_cpu_usage();
-    resourceTimer = new QTimer(this);
-    connect(resourceTimer, &QTimer::timeout, this, [this]() {
+    //resourceTimer = new QTimer(this);
+    resourceTimer = std::make_unique<QTimer>(this);
+    connect(resourceTimer.get(), &QTimer::timeout, this, [this]() {
         updateCpuUsage();
         updateSwapUsage();
         updateRamUsage();
         updateDiskUsage();
+        updateInternetUsage();
     });
     resourceTimer->start(1000);
 
     createCpuLoadChart();
-    chartUpdateTimer = new QTimer(this);
-    connect(chartUpdateTimer, &QTimer::timeout, this, [this]() {
+    chartUpdateTimer = std::make_unique<QTimer>(this);
+    connect(chartUpdateTimer.get(), &QTimer::timeout, this, [this]() {
         Resmon::CPUStats current = Resmon::get_cpu_usage();
         double usage = current.usage_percent(prevCpuStats);
         prevCpuStats = current;
@@ -74,11 +80,11 @@ MainWindow::MainWindow(QWidget *parent)
     logL("MainWindow: MainWindow initialization completed");
 }
 
-MainWindow::~MainWindow()
-{
-    logL("MainWindow: MainWindow destruction started");
-    delete ui;
-    logL("MainWindow: MainWindow destroyed");
+MainWindow::~MainWindow() {
+    logL("MainWindow: Cleanup started");
+    //resourceTimer->stop();
+    //chartUpdateTimer->stop();
+    logL("MainWindow: Cleanup completed");
 }
 
 void MainWindow::populateServicesTable()
@@ -353,7 +359,7 @@ void MainWindow::on_deleteSelectedFilesButton_clicked()
         try {
             if (std::filesystem::remove(filePath.toStdString())) {
                 deletedCount++;
-                logL(std::format("MainWindow: Deleted file: {}", filePath.toStdString()));
+                //logL(std::format("MainWindow: Deleted file: {}", filePath.toStdString()));
             } else {
                 failedCount++;
                 logE(std::format("MainWindow: Failed to delete file: {}", filePath.toStdString()));
@@ -571,6 +577,13 @@ void MainWindow::updateDiskUsage()
                                     .arg(disk.total / (1024 * 1024)));
 }
 
+void MainWindow::updateInternetUsage(){
+    Resmon::NetworkStats network = Resmon::get_internet_usage("wlo1");
+
+    ui->downloadLabel->setText(tr("Download: %1KB/s").arg(network.rx_speed));
+    ui->uploadLabel->setText(tr("Upload: %1KB/s").arg(network.tx_speed));
+}
+
 void MainWindow::onLanguageChanged(int index)
 {
     QString localeCode = ui->languageComboBox->itemData(index).toString();
@@ -578,15 +591,15 @@ void MainWindow::onLanguageChanged(int index)
 
     logL(std::format("MainWindow: Changing language to: {}", localeCode.toStdString()));
 
-    qApp->removeTranslator(m_translator);
-    delete m_translator;
-    m_translator = new QTranslator(this);
+    qApp->removeTranslator(m_translator.get());
+    //delete m_translator;
+    m_translator = std::make_unique<QTranslator>(this);
 
     QString translationFile = QString(":translations/qtguiinterface_%1.qm").arg(localeCode);
     logL(std::format("MainWindow: Loading translation file: {}", translationFile.toStdString()));
 
     if (m_translator->load(translationFile)) {
-        qApp->installTranslator(m_translator);
+        qApp->installTranslator(m_translator.get());
         logL("MainWindow: Translation loaded successfully");
     } else {
         logE("MainWindow: Failed to load translation");

@@ -8,9 +8,9 @@
 class AddAutostartDialog : public QDialog{
     Q_OBJECT
 private:
-    QLineEdit *nameEdit;
-    QLineEdit *execEdit;
-    QLineEdit *commentEdit;
+    QLineEdit* nameEdit;
+    QLineEdit* execEdit;
+    QLineEdit* commentEdit;
 public:
     AddAutostartDialog(QWidget *parent = nullptr);
 

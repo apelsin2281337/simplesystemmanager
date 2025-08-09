@@ -30,7 +30,7 @@
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
+         <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -51,27 +51,58 @@
        <attribute name="title">
         <string>System Resources</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <layout class="QVBoxLayout" name="verticalLayout_11">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_7">
+         <widget class="QGroupBox" name="cpuGroupBox">
+          <property name="title">
+           <string>CPU Usage</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QProgressBar" name="cpuUsageBar"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="cpuUsageLabel">
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QGroupBox" name="cpuGroupBox">
+           <widget class="QGroupBox" name="swapGroupBox">
             <property name="title">
-             <string>CPU Usage</string>
+             <string>Swap Usage</string>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
+            <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="QProgressBar" name="cpuUsageBar"/>
+              <widget class="QProgressBar" name="swapUsageBar">
+               <property name="minimum">
+                <number>0</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+              </widget>
              </item>
              <item>
-              <widget class="QLabel" name="cpuUsageLabel">
+              <widget class="QLabel" name="swapUsageLabel">
                <property name="font">
                 <font>
                  <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignCenter</set>
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -79,136 +110,86 @@
            </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_10"/>
+           <widget class="QGroupBox" name="ramGroupBox">
+            <property name="title">
+             <string>RAM Usage</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <widget class="QProgressBar" name="ramUsageBar"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="ramUsageLabel">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QGroupBox" name="networkGroupBox">
+            <property name="title">
+             <string>Network Usage</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <widget class="QLabel" name="downloadLabel">
+               <property name="text">
+                <string>Download: 0 KB/s</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="uploadLabel">
+               <property name="text">
+                <string>Upload: 0 KB/s</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <item>
-             <widget class="QGroupBox" name="swapGroupBox">
-              <property name="title">
-               <string>Swap Usage</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout">
-               <item>
-                <widget class="QProgressBar" name="swapUsageBar">
-                 <property name="minimum">
-                  <number>-1</number>
-                 </property>
-                 <property name="value">
-                  <number>-1</number>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="swapUsageLabel">
-                 <property name="font">
-                  <font>
-                   <pointsize>12</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="ramGroupBox">
-              <property name="title">
-               <string>RAM Usage</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_6">
-               <item>
-                <widget class="QProgressBar" name="ramUsageBar"/>
-               </item>
-               <item>
-                <widget class="QLabel" name="ramUsageLabel">
-                 <property name="font">
-                  <font>
-                   <pointsize>12</pointsize>
-                  </font>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
-            <item>
-             <widget class="QGroupBox" name="diskGroupBox">
-              <property name="title">
-               <string>Disk Usage</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_4">
-               <item>
-                <widget class="QProgressBar" name="diskUsageBar">
-                 <property name="value">
-                  <number>0</number>
-                 </property>
-                 <property name="textVisible">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="diskUsageLabel">
-                 <property name="font">
-                  <font>
-                   <pointsize>12</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="networkGroupBox">
-              <property name="title">
-               <string>Network Usage</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_11">
-               <item>
-                <widget class="QLabel" name="downloadLabel">
-                 <property name="text">
-                  <string>Download: 0 KB/s</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="uploadLabel">
-                 <property name="text">
-                  <string>Upload: 0 KB/s</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QGroupBox" name="diskGroupBox">
+            <property name="title">
+             <string>Disk Usage</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <widget class="QProgressBar" name="diskUsageBar">
+               <property name="value">
+                <number>0</number>
+               </property>
+               <property name="textVisible">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="diskUsageLabel">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </item>

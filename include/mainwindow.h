@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QtGlobal>
+#include <memory>
 
 #include "include/services.hpp"
 #include "include/temp_files.hpp"
@@ -61,16 +62,26 @@ private slots:
     void onLanguageChanged(int index);
 
 private:
-    Ui::MainWindow *ui;
-    QStandardItemModel *servicesModel;
-    QSortFilterProxyModel *servicesProxyModel;
-    QStandardItemModel *tempFilesModel;
-    QStandardItemModel *autostartModel;
-    QChart *chart = nullptr;
-    QSplineSeries *series = nullptr;
-    QValueAxis *axisX = nullptr;
-    QValueAxis *axisY = nullptr;
-    QChartView *chartView = nullptr;
+    //Ui::MainWindow *ui;
+    std::unique_ptr<Ui::MainWindow> ui;
+    //QStandardItemModel *servicesModel;
+    std::unique_ptr<QStandardItemModel> servicesModel;
+    //QSortFilterProxyModel *servicesProxyModel;
+    std::unique_ptr<QSortFilterProxyModel> servicesProxyModel;
+    //QStandardItemModel *tempFilesModel;
+    std::unique_ptr<QStandardItemModel> tempFilesModel;
+    //QStandardItemModel *autostartModel;
+    std::unique_ptr<QStandardItemModel> autostartModel;
+    //QChart *chart = nullptr;
+    //QSplineSeries *series = nullptr;
+    //QValueAxis *axisX = nullptr;
+    //QValueAxis *axisY = nullptr;
+    //QChartView *chartView = nullptr;
+    QChart* chart = nullptr;
+    QSplineSeries* series = nullptr;
+    QValueAxis* axisX = nullptr;
+    QValueAxis* axisY = nullptr;
+    QChartView* chartView = nullptr;
     void populateServicesTable();
     void populateAutostartTable();
     void showError(const QString &message);
@@ -80,14 +91,15 @@ private:
     void updateDiskUsage();
     void updateSwapUsage();
     void updateSystemInfo();
+    void updateInternetUsage();
     void createCpuLoadChart();
     void updateChart(double usage);
     Resmon::CPUStats prevCpuStats;
-    QTimer *resourceTimer;
-    QTimer* chartUpdateTimer;
-    QDialog *newEntryDialog;
-    QTranslator *translator;
-    QTranslator *m_translator;
+    std::unique_ptr<QTimer> resourceTimer;
+    std::unique_ptr<QTimer> chartUpdateTimer;
+    std::unique_ptr<QDialog> newEntryDialog;
+    std::unique_ptr<QTranslator> translator;
+    std::unique_ptr<QTranslator> m_translator;
 };
 
 

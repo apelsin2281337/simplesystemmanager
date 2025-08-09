@@ -1,0 +1,13 @@
+[LOG] 09-08-2025_16-13-03.661051245: Application has started!
+[LOG] 09-08-2025_16-13-03.691852335: MainWindow: Initializing MainWindow
+[LOG] 09-08-2025_16-13-03.773362189: MainWindow: Creating CPU load chart
+[LOG] 09-08-2025_16-13-03.780191760: MainWindow: Populating services table
+[LOG] 09-08-2025_16-13-03.780220601: Fetching list of services
+[LOG] 09-08-2025_16-13-03.783546260: Services: Services: Found 233 services
+[LOG] 09-08-2025_16-13-03.784423402: MainWindow: Added 233 services to table
+[LOG] 09-08-2025_16-13-03.784444867: MainWindow: Populating autostart table
+[LOG] 09-08-2025_16-13-03.784516433: Autostart: 53 entries has been found
+[LOG] 09-08-2025_16-13-03.790284953: MainWindow: Added 53 autostart entries to table
+[LOG] 09-08-2025_16-13-03.790293976: MainWindow: MainWindow initialization completed
+[LOG] 09-08-2025_16-13-07.117791455: MainWindow: Cleanup started
+[LOG] 09-08-2025_16-13-07.118139835: MainWindow: Cleanup completed

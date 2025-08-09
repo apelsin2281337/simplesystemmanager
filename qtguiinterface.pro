@@ -8,6 +8,7 @@ SOURCES += \
     src/logger.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
+    src/resource_monitor.cpp \
     src/services.cpp \
     src/temp_files.cpp \
     src/autostart.cpp
