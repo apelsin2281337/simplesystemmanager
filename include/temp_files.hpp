@@ -6,7 +6,11 @@
 #include <pwd.h>
 #include <cstdlib>
 #include <expected>
+
+
 #include <QTranslator>
+
+
 #include "mainwindow.h"
 #include "include/logger.hpp"
 

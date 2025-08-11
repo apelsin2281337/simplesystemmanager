@@ -19,7 +19,10 @@
 #include <QFile>
 #include <QTextStream>
 #include <QtGlobal>
+
+
 #include <memory>
+
 
 #include "include/services.hpp"
 #include "include/temp_files.hpp"
@@ -100,6 +103,9 @@ private:
     std::unique_ptr<QDialog> newEntryDialog;
     std::unique_ptr<QTranslator> translator;
     std::unique_ptr<QTranslator> m_translator;
+    std::unique_ptr<QTimer> networkTimer;
+    QString networkInterface = "wlo1";
+    Resmon::NetworkStats lastNetworkStats;
 };
 
 

@@ -55,12 +55,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     prevCpuStats = Resmon::get_cpu_usage();
     //resourceTimer = new QTimer(this);
+    updateDiskUsage();
     resourceTimer = std::make_unique<QTimer>(this);
     connect(resourceTimer.get(), &QTimer::timeout, this, [this]() {
         updateCpuUsage();
         updateSwapUsage();
         updateRamUsage();
-        updateDiskUsage();
+
         updateInternetUsage();
     });
     resourceTimer->start(1000);
@@ -84,7 +85,7 @@ MainWindow::~MainWindow() {
     logL("MainWindow: Cleanup started");
     //resourceTimer->stop();
     //chartUpdateTimer->stop();
-    logL("MainWindow: Cleanup completed");
+    logL("MainWindow: Cleanup completed\n");
 }
 
 void MainWindow::populateServicesTable()
@@ -577,12 +578,25 @@ void MainWindow::updateDiskUsage()
                                     .arg(disk.total / (1024 * 1024)));
 }
 
-void MainWindow::updateInternetUsage(){
-    Resmon::NetworkStats network = Resmon::get_internet_usage("wlo1");
 
-    ui->downloadLabel->setText(tr("Download: %1KB/s").arg(network.rx_speed));
-    ui->uploadLabel->setText(tr("Upload: %1KB/s").arg(network.tx_speed));
+
+void MainWindow::updateInternetUsage(){
+    Resmon::NetworkStats network = Resmon::get_internet_usage();
+    const QStringList units = {"KB/s", "MB/s", "GB/s"};
+    auto formatSpeed = [&](double speed){
+        int unitIndex = 0;
+        while (speed >= 1024.0 && unitIndex < units.size() - 1) {
+            speed /= 1024.0;
+            unitIndex++;
+        }
+
+        return QString("%1 %2").arg(QString::number(speed, 'f', 2)).arg(units[unitIndex]);
+    };
+    ui->downloadLabel->setText(tr("Download: %1").arg(formatSpeed(network.rx_speed)));
+    ui->uploadLabel->setText(tr("Upload: %1").arg(formatSpeed(network.tx_speed)));
 }
+
+
 
 void MainWindow::onLanguageChanged(int index)
 {

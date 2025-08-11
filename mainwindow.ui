@@ -61,7 +61,11 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <item>
-              <widget class="QProgressBar" name="cpuUsageBar"/>
+              <widget class="QProgressBar" name="cpuUsageBar">
+               <property name="textVisible">
+                <bool>false</bool>
+               </property>
+              </widget>
              </item>
              <item>
               <widget class="QLabel" name="cpuUsageLabel">
@@ -97,6 +101,9 @@
                  <property name="value">
                   <number>-1</number>
                  </property>
+                 <property name="textVisible">
+                  <bool>false</bool>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -124,7 +131,11 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
                <item>
-                <widget class="QProgressBar" name="ramUsageBar"/>
+                <widget class="QProgressBar" name="ramUsageBar">
+                 <property name="textVisible">
+                  <bool>false</bool>
+                 </property>
+                </widget>
                </item>
                <item>
                 <widget class="QLabel" name="ramUsageLabel">
@@ -157,7 +168,7 @@
                   <number>0</number>
                  </property>
                  <property name="textVisible">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>

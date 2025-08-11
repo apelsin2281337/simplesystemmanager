@@ -1,3 +1,13 @@
+#include <vector>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <mutex>
+#include <cstdlib>
+#include <stdexcept>
+#include <format>
+
+
 #include "include/resource_monitor.hpp"
 
 std::mutex Resmon::statsMutex_;
@@ -92,35 +102,45 @@ Resmon::MemStats Resmon::get_mem_usage() {
     return result;
 }
 
-Resmon::NetworkStats Resmon::get_internet_usage(const std::string& interface){
+Resmon::NetworkStats Resmon::get_internet_usage() {
     std::lock_guard<std::mutex> lock(statsMutex_);
-    NetworkStats stats;
+    NetworkStats stats = {0, 0};
+    static unsigned long long last_rx_bytes = 0, last_tx_bytes = 0;
+    unsigned long long rx_bytes = 0, tx_bytes = 0;
+
     std::ifstream file("/proc/net/dev");
-    unsigned long long tx_bytes, rx_bytes;
+    if (!file.is_open()) {
+        return stats;
+    }
+
     std::string line;
     while (std::getline(file, line)) {
-        if (line.find(interface) != std::string::npos) {
-            size_t colon_pos = line.find(":");
-            line = line.substr(colon_pos + 1);
-            sscanf(line.c_str(), "%llu %*u %*u %*u %*u %*u %*u %*u %llu", &rx_bytes, &tx_bytes);
-            break;
+        if (line.find("lo:") == 0 || line.find("docker") != std::string::npos ||
+            line.find("virbr") != std::string::npos || line.find("veth") != std::string::npos) {
+            continue;
+        }
+
+        size_t colon_pos = line.find(":");
+        if (colon_pos != std::string::npos) {
+            std::string data = line.substr(colon_pos + 1);
+            unsigned long long if_rx, if_tx;
+            if (sscanf(data.c_str(), "%llu %*u %*u %*u %*u %*u %*u %*u %llu", &if_rx, &if_tx) == 2) {
+                rx_bytes = if_rx;
+                tx_bytes = if_tx;
+            }
         }
     }
     file.close();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    file.open("/proc/net/dev");
-    unsigned long long new_rx_bytes = 0, new_tx_bytes = 0;
-    while (std::getline(file, line)) {
-        if (line.find(interface) != std::string::npos) {
-            size_t colon_pos = line.find(":");
-            line = line.substr(colon_pos + 1);
-            sscanf(line.c_str(), "%llu %*u %*u %*u %*u %*u %*u %*u %llu", &new_rx_bytes, &new_tx_bytes);
-            break;
-        }
+    if (last_rx_bytes > 0 && last_tx_bytes > 0) {
+        stats.rx_speed = (rx_bytes - last_rx_bytes) / 1024;
+        stats.tx_speed = (tx_bytes - last_tx_bytes) / 1024;
     }
 
-    stats.rx_speed = (new_rx_bytes - rx_bytes) / 1024.0;
-    stats.tx_speed = (new_tx_bytes - tx_bytes) / 1024.0;
+    last_rx_bytes = rx_bytes;
+    last_tx_bytes = tx_bytes;
+
     return stats;
 }
+
+

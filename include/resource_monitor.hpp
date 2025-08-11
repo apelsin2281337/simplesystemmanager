@@ -7,6 +7,8 @@
 #include <sstream>
 #include <mutex>
 #include <thread>
+#include <future>
+#include <format>
 #include <unistd.h>
 #include <sys/statvfs.h>
 
@@ -64,13 +66,15 @@ public:
     };
 
     struct NetworkStats {
-        double rx_speed;
-        double tx_speed;
+        size_t rx_speed;
+        size_t tx_speed;
     };
+
+
 
     static DiskStats get_disk_usage();
 
-    static NetworkStats get_internet_usage(const std::string& interface);
+    static NetworkStats get_internet_usage();
 
     static CPUStats get_cpu_usage();
 

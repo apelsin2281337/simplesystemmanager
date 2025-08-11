@@ -1,10 +1,13 @@
 #include "include/mainwindow.h"
 #include "include/logger.hpp"
+
+
 #include <QApplication>
 #include <QMessageBox>
-#include <unistd.h>
 #include <QTranslator>
 #include <QLocale>
+
+#include <unistd.h>
 
 int main(int argc, char *argv[])
 {
