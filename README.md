@@ -11,7 +11,9 @@ A system management tool with a Qt GUI interface.
 
 ## Building
 ```bash
-qmake qtguiinterface.pro
+mkdir build
+cd build
+cmake ..
 make
 ```
 

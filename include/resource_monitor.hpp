@@ -27,10 +27,10 @@ private:
 
 public:
     struct CPUStats {
-        uint64_t user;
-        uint64_t nice;
-        uint64_t system;
-        uint64_t idle;
+        uint64_t user = 0;
+        uint64_t nice = 0;
+        uint64_t system = 0;
+        uint64_t idle = 0;
 
         uint64_t total() const { return user + nice + system + idle; }
         double usage_percent(const CPUStats& prev) const {
