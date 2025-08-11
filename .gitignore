@@ -3,7 +3,7 @@ build-*/
 *.pro.user
 *.pro.user.*
 *.autosave
-
+include/fd.cpp
 build/**
 build.sh
 *.json

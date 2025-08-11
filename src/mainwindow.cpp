@@ -64,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         updateInternetUsage();
     });
+    //не менять сломается инет
     resourceTimer->start(1000);
 
     createCpuLoadChart();
