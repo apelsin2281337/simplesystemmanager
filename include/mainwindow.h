@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QtGlobal>
+#include <QIcon>
 
 
 #include <memory>

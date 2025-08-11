@@ -55,13 +55,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     prevCpuStats = Resmon::get_cpu_usage();
     //resourceTimer = new QTimer(this);
-    updateDiskUsage();
+    ;
     resourceTimer = std::make_unique<QTimer>(this);
     connect(resourceTimer.get(), &QTimer::timeout, this, [this]() {
         updateCpuUsage();
         updateSwapUsage();
         updateRamUsage();
-
+        updateDiskUsage();
         updateInternetUsage();
     });
     //не менять сломается инет

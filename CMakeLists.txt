@@ -44,6 +44,7 @@ set(FORMS
 
 set(RESOURCES
     resources/translations.qrc
+    resources/icon.qrc
 )
 
 

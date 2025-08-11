@@ -5,9 +5,9 @@ Logger::Logger() {
     auto now_local = std::chrono::current_zone()->to_local(now);
 
     std::string timeString = std::format("{:%d-%m-%Y}", now_local);
-    fileName_ = std::format("logs/Log_{}.txt", timeString);
+    fileName_ = std::format("/var/log/systemmanager/Log_{}.txt", timeString);
 
-    std::filesystem::create_directory("logs");
+    std::filesystem::create_directory("/var/log/systemmanager/");
 }
 
 void Logger::log(Status status, const std::string& message) {
