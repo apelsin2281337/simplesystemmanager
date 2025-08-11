@@ -123,11 +123,7 @@ Resmon::NetworkStats Resmon::get_internet_usage() {
         size_t colon_pos = line.find(":");
         if (colon_pos != std::string::npos) {
             std::string data = line.substr(colon_pos + 1);
-            unsigned long long if_rx, if_tx;
-            if (sscanf(data.c_str(), "%llu %*u %*u %*u %*u %*u %*u %*u %llu", &if_rx, &if_tx) == 2) {
-                rx_bytes = if_rx;
-                tx_bytes = if_tx;
-            }
+            sscanf(data.c_str(), "%llu %*u %*u %*u %*u %*u %*u %*u %llu", &rx_bytes, &tx_bytes);
         }
     }
     file.close();
