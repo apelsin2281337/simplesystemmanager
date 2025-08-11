@@ -1,5 +1,5 @@
-#include "include/mainwindow.h"
-#include "include/logger.hpp"
+#include "../include/mainwindow.h"
+#include "../include/logger.hpp"
 
 
 #include <QApplication>

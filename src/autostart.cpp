@@ -1,4 +1,4 @@
-#include "include/autostart.hpp"
+#include "../include/autostart.hpp"
 
 std::filesystem::path autostart_dir_= "/etc/xdg/autostart";
 
@@ -27,22 +27,22 @@ bool AutostartManager::addAutostartEntry(const std::string& name, const std::str
 }
 
 bool AutostartManager::removeAutostartEntry(const std::string& name){
-        std::filesystem::path desktop_file = autostart_dir_ / (name + ".desktop");
-        if (!std::filesystem::exists(desktop_file)) {
-            logE(std::format("Autostart: File {0} did not open successfully. it probably does not exist", desktop_file.string()));
-            return false;
+    std::filesystem::path desktop_file = autostart_dir_ / (name + ".desktop");
+    if (!std::filesystem::exists(desktop_file)) {
+        logE(std::format("Autostart: File {0} did not open successfully. it probably does not exist", desktop_file.string()));
+        return false;
 
-        }
-        
-        try {
-            logL(std::format("Autostart: Trying to remove file {0}", desktop_file.string()));
-            return std::filesystem::remove(desktop_file);
-            logL("Success!");
-        } catch (const std::filesystem::filesystem_error& e) {
-            logE(std::format("Autostart: File {0} removal failed", desktop_file.string()));
-            return false;
-        }
     }
+
+    try {
+        logL(std::format("Autostart: Trying to remove file {0}", desktop_file.string()));
+        return std::filesystem::remove(desktop_file);
+        logL("Success!");
+    } catch (const std::filesystem::filesystem_error& e) {
+        logE(std::format("Autostart: File {0} removal failed", desktop_file.string()));
+        return false;
+    }
+}
 
 bool AutostartManager::setAutostartEntryEnabledStatus(const std::string& name, bool status){
     std::filesystem::path desktop_file = autostart_dir_ / (name + ".desktop");

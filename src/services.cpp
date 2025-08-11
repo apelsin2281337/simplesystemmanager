@@ -2,8 +2,8 @@
 #include <cstring>
 #include <unistd.h>
 
-#include "include/services.hpp"
-#include "include/logger.hpp"
+#include "../include/services.hpp"
+#include "../include/logger.hpp"
 
 #define DESTINATION "org.freedesktop.systemd1"
 #define PATH        "/org/freedesktop/systemd1"

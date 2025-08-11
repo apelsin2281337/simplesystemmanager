@@ -24,14 +24,14 @@
 #include <memory>
 
 
-#include "include/services.hpp"
-#include "include/temp_files.hpp"
-#include "include/autostart.hpp"
-#include "include/addautostartdialog.hpp"
-#include "include/mainwindow.h"
+#include "../include/services.hpp"
+#include "../include/temp_files.hpp"
+#include "../include/autostart.hpp"
+#include "../include/addautostartdialog.hpp"
+#include "../include/mainwindow.h"
 #include "ui_mainwindow.h"
-#include "include/logger.hpp"
-#include "include/resource_monitor.hpp"
+#include "../include/logger.hpp"
+#include "../include/resource_monitor.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

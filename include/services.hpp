@@ -5,7 +5,7 @@
 #include <memory>
 
 
-#include "include/logger.hpp"
+#include "../include/logger.hpp"
 
 struct ServiceInfo{
     std::string name;

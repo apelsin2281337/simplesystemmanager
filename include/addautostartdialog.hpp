@@ -5,7 +5,7 @@
 #include <QDialogButtonBox>
 
 
-#include "include/logger.hpp"
+#include "../include/logger.hpp"
 
 class AddAutostartDialog : public QDialog{
     Q_OBJECT

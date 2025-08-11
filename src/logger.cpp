@@ -1,4 +1,4 @@
-#include "include/logger.hpp"
+#include "../include/logger.hpp"
 
 Logger::Logger() {
     auto now = std::chrono::system_clock::now();

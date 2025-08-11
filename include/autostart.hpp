@@ -10,7 +10,7 @@
 #include <QDebug>
 
 
-#include "include/logger.hpp"
+#include "../include/logger.hpp"
 
 class AutostartManager{
 public:

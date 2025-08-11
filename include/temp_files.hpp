@@ -12,7 +12,7 @@
 
 
 #include "mainwindow.h"
-#include "include/logger.hpp"
+#include "../include/logger.hpp"
 
 std::expected<std::vector<std::filesystem::path>, std::string> get_recursive_folder_content(const std::filesystem::path& folder_path);
 std::filesystem::path get_home_directory();
