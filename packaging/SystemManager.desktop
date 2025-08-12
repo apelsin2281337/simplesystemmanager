@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=SystemManager
-Comment=System Management Tool
-Exec=SystemManager
-Icon=SystemManager
-Terminal=false
-Type=Application
-Categories=System;Utility;
