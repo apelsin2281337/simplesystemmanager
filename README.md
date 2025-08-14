@@ -19,7 +19,7 @@ make
 
 ## Distribution-Specific Dependencies
 
-### Fedora
+### Fedora (based distros)
 ```bash
 # In case something goes wrong with the installation try to enable rpmfusion
 sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
@@ -31,14 +31,20 @@ sudo rm -f /etc/yum.repos.d/fedora-cisco-openh264.repo
 sudo dnf install qt6-qtbase qt6-qttools-devel qt6-linguist qt6-qtsvg-devel qt6-qtwayland qt6-qtcharts-devel cmake gcc-g++ systemd-devel
 ```
 
-### Ubuntu
+### Debian, Ubuntu (based distros)
 ```bash
 sudo apt install qt6-base-dev qt6-base-dev-tools qt6-tools-dev qt6-l10n-tools libqt6svg6-dev qt6-qpa-plugins qt6-wayland libqt6charts6-dev libqt6charts6 cmake build-essential libsystemd-dev
 ```
 
-### Arch Linux
+### Arch Linux (based distros)
 ```bash
 sudo pacman -S qt6-base qt6-tools qt6-svg qt6-wayland qt6-charts cmake base-devel systemd
+```
+
+### Windows
+```bash
+curl ascii.live/rick
+#there wont be windows support anytime soon.
 ```
 
 If any of these blocks are not fixing dependency issues contact me!
