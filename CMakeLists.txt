@@ -2,11 +2,24 @@ cmake_minimum_required(VERSION 3.16)
 project(SystemManager)
 
 
+file(GLOB QT_PATHS "/usr/local/Qt-*")
+if(QT_PATHS)
+    list(SORT QT_PATHS)
+    list(REVERSE QT_PATHS)
+    list(GET QT_PATHS 0 LATEST_QT_PATH)
+    list(APPEND CMAKE_PREFIX_PATH "${LATEST_QT_PATH}")
+    message(STATUS "Using custom Qt path: ${LATEST_QT_PATH}")
+else()
+    message(STATUS "Using system Qt installation")
+endif()
+list(APPEND CMAKE_PREFIX_PATH "/usr")  # Системные пути
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_AUTOGEN_BUILD_DIR ${CMAKE_BINARY_DIR}/autogen)
 set(CMAKE_RCC_BUILD_DIR ${CMAKE_BINARY_DIR}/rcc)
+
 
 
 set(CMAKE_AUTOMOC ON)
