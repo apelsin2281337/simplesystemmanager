@@ -77,3 +77,73 @@ add_custom_target(translations ALL DEPENDS ${QM_FILES})
 
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
+
+install(FILES packaging/SystemManager.ico
+        DESTINATION share/icons/hicolor/256x256/apps
+        RENAME SystemManager.png
+)
+
+install(FILES packaging/SystemManager.ico
+        DESTINATION share/icons/hicolor/48x48/apps
+        RENAME SystemManager.png
+)
+
+install(FILES packaging/SystemManager.ico
+        DESTINATION share/icons/hicolor/32x32/apps
+        RENAME SystemManager.png
+)
+
+install(FILES packaging/SystemManager.desktop
+        DESTINATION share/applications
+)
+
+install(FILES ${QM_FILES}
+        DESTINATION share/${PROJECT_NAME}/translations
+)
+
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
+
+install(PROGRAMS packaging/start-manager.sh
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    RENAME systemmanager-start
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                GROUP_READ GROUP_EXECUTE
+                WORLD_READ WORLD_EXECUTE
+)
+
+
+configure_file(
+    packaging/SystemManager.desktop
+    ${CMAKE_CURRENT_BINARY_DIR}/SystemManager.desktop
+    @ONLY
+)
+
+# Install the modified desktop file
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SystemManager.desktop
+    DESTINATION share/applications
+)
+
+# Packaging configuration
+set(CPACK_PACKAGE_NAME "System Manager")
+set(CPACK_PACKAGE_VENDOR "apelsin")
+set(CPACK_PACKAGE_VERSION "1.0.2")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "System Management Tool")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+
+# DEB specific settings
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "apelsin <ggwp.gg6578@gmail.com>")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6core6, libqt6gui6, libqt6widgets6, libqt6charts6, policykit-1")
+set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
+
+# RPM specific settings
+set(CPACK_RPM_PACKAGE_REQUIRES "qt6-qtbase >= 6.2, qt6-qtcharts >= 6.2, polkit")
+set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/bin")
+set(CPACK_RPM_SPEC_MORE_DEFINES "%define _binary_payload w9.gzdio")
+set(CPACK_RPM_USER_FILELIST
+    "%attr(755,root,root) /usr/bin/systemmanager-start"
+)
+
+include(CPack)

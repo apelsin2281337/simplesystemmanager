@@ -7,7 +7,6 @@ include/fd.cpp
 build/**
 build.sh
 *.json
-translations/*.ts
 moc_predefs.h
 
 # Compiled files
