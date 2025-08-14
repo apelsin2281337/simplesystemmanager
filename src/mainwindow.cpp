@@ -491,14 +491,14 @@ void MainWindow::createCpuLoadChart()
     chart->addSeries(series);
     chart->setTitle(tr("CPU Load Graph"));
     chart->setTitleFont(QFont("Ubuntu", 11));
-    chart->setTitleBrush(QBrush(QColor("white")));
+    //chart->setTitleBrush(QBrush(QColor("white")));
     axisX = new QValueAxis();
     axisY = new QValueAxis();
     axisY->setRange(0, 100);
     axisX->setGridLineVisible(false);
     axisY->setGridLineColor(QColor("#3d3d3d"));
-    axisX->setLabelsBrush(QBrush(QColor("white")));
-    axisY->setLabelsBrush(QBrush(QColor("white")));
+    //axisX->setLabelsBrush(QBrush(QColor("white")));
+    //axisY->setLabelsBrush(QBrush(QColor("white")));
     axisY->setLabelFormat(QString("%d%%"));
     axisX->setLabelsVisible(false);
     chart->addAxis(axisX, Qt::AlignBottom);
