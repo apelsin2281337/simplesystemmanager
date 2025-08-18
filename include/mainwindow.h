@@ -64,23 +64,15 @@ private slots:
     void on_selectAllFilesButton_clicked();
     void on_clearSelectedFilesButton_clicked();
     void onLanguageChanged(int index);
+    void loadTheme(const QString& themeName);
+    void onThemeChanged(int index);
 
 private:
-    //Ui::MainWindow *ui;
     std::unique_ptr<Ui::MainWindow> ui;
-    //QStandardItemModel *servicesModel;
     std::unique_ptr<QStandardItemModel> servicesModel;
-    //QSortFilterProxyModel *servicesProxyModel;
     std::unique_ptr<QSortFilterProxyModel> servicesProxyModel;
-    //QStandardItemModel *tempFilesModel;
     std::unique_ptr<QStandardItemModel> tempFilesModel;
-    //QStandardItemModel *autostartModel;
     std::unique_ptr<QStandardItemModel> autostartModel;
-    //QChart *chart = nullptr;
-    //QSplineSeries *series = nullptr;
-    //QValueAxis *axisX = nullptr;
-    //QValueAxis *axisY = nullptr;
-    //QChartView *chartView = nullptr;
     QChart* chart = nullptr;
     QSplineSeries* series = nullptr;
     QValueAxis* axisX = nullptr;
@@ -105,7 +97,6 @@ private:
     std::unique_ptr<QTranslator> translator;
     std::unique_ptr<QTranslator> m_translator;
     std::unique_ptr<QTimer> networkTimer;
-    QString networkInterface = "wlo1";
     Resmon::NetworkStats lastNetworkStats;
 };
 

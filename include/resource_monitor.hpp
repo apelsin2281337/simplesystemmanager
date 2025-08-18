@@ -17,9 +17,6 @@
 
 
 class Resmon {
-    #ifdef UNIT_TESTING
-    friend class ResmonTest;
-    #endif
 private:
     static std::mutex statsMutex_;
     static std::vector<std::string> get_cpu_stats();

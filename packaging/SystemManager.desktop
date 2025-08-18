@@ -1,7 +1,6 @@
 [Desktop Entry]
-Categories=System;Utility;
 Comment=System Management Tool
-Exec=/usr/bin/systemmanager-start
+Exec=/home/orange/wowlol/simplesystemmanager/packaging/start-manager
 Icon=SystemManager
 Name=SystemManager
 Type=Application

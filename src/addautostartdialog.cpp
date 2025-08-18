@@ -3,12 +3,10 @@
 AddAutostartDialog::AddAutostartDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("Add Autostart Entry!"));
 
-    // Create widgets directly (Qt will manage memory)
     nameEdit = new QLineEdit(this);
     execEdit = new QLineEdit(this);
     commentEdit = new QLineEdit(this);
 
-    // Create layouts directly
     QFormLayout *formLayout = new QFormLayout();
     formLayout->addRow(tr("Name: "), nameEdit);
     formLayout->addRow(tr("Executable:"), execEdit);

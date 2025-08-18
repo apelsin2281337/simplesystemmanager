@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     }
     MainWindow w;
     w.setWindowIcon(QIcon(":/icon.ico"));
-    w.setFixedSize(800,600);
+    //w.setFixedSize(800,700);
     w.show();
     return a.exec();
 }

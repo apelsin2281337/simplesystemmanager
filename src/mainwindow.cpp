@@ -17,25 +17,33 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onLanguageChanged);
     ui->languageComboBox->setCurrentIndex(0);
 
+    ui->themeComboBox->addItem(tr("Dark Theme"), "dark");
+    ui->themeComboBox->addItem(tr("Light Theme"), "light");
+    connect(ui->themeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onThemeChanged);
+    ui->themeComboBox->setCurrentIndex(0);
+
     servicesModel = std::make_unique<QStandardItemModel>(this);
-    //servicesModel = new QStandardItemModel(this);
     servicesModel->setColumnCount(3);
     servicesModel->setHorizontalHeaderLabels({tr("Service"), tr("Description"), tr("Status")});
 
-    //servicesProxyModel = new QSortFilterProxyModel(this);
     servicesProxyModel = std::make_unique<QSortFilterProxyModel>(this);
     servicesProxyModel->setSourceModel(servicesModel.get());
     servicesProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
     ui->servicesTable->setModel(servicesProxyModel.get());
-    ui->servicesTable->setColumnWidth(0, 300);
-    ui->servicesTable->setColumnWidth(1, 338);
-    ui->servicesTable->setColumnWidth(2, 68);
+    //ui->servicesTable->setColumnWidth(0, 300);
+    //ui->servicesTable->setColumnWidth(1, 338);
+    //ui->servicesTable->setColumnWidth(2, 68);
+
+    ui->servicesTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui->servicesTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->servicesTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Fixed);
+    ui->servicesTable->setColumnWidth(2, 100);
     ui->servicesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     connect(ui->searchServicesLineEdit, &QLineEdit::textChanged,
             this, &MainWindow::on_searchServicesTextChanged);
 
-    //tempFilesModel = new QStandardItemModel(this);
     tempFilesModel = std::make_unique<QStandardItemModel>(this);
     tempFilesModel->setColumnCount(1);
     tempFilesModel->setHorizontalHeaderLabels({tr("File Path")});
@@ -43,18 +51,18 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tempFilesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tempFilesTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    //autostartModel = new QStandardItemModel(this);
     autostartModel = std::make_unique<QStandardItemModel>(this);
     autostartModel->setColumnCount(3);
-    autostartModel->setHorizontalHeaderLabels({tr("Name"), tr("Executable"), tr("Comment")});
+    autostartModel->setHorizontalHeaderLabels({tr("Name"), tr("Executable"), tr("Status"), tr("Comment")});
     ui->autostartTable->setModel(autostartModel.get());
-    ui->autostartTable->setColumnWidth(0, 256);
-    ui->autostartTable->setColumnWidth(1, 255);
-    ui->autostartTable->setColumnWidth(2, 255);
+    ui->autostartTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui->autostartTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->autostartTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    ui->autostartTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
     ui->autostartTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     prevCpuStats = Resmon::get_cpu_usage();
-    //resourceTimer = new QTimer(this);
+
     ;
     resourceTimer = std::make_unique<QTimer>(this);
     connect(resourceTimer.get(), &QTimer::timeout, this, [this]() {
@@ -79,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     populateServicesTable();
     populateAutostartTable();
+    loadTheme("dark");
     logL("MainWindow: MainWindow initialization completed");
 }
 
@@ -131,9 +140,10 @@ void MainWindow::populateAutostartTable()
         auto info = AutostartManager::getAutostartEntryInfo(entry);
         QStandardItem *nameItem = new QStandardItem(QString::fromStdString(info["Name"]));
         QStandardItem *execItem = new QStandardItem(QString::fromStdString(info["Exec"]));
+        QStandardItem *statusItem = new QStandardItem(QString::fromStdString(info["Status"]));
         QStandardItem *commentItem = new QStandardItem(QString::fromStdString(info["Comment"]));
 
-        rowItems << nameItem << execItem << commentItem;
+        rowItems << nameItem << execItem << statusItem << commentItem;
         autostartModel->appendRow(rowItems);
     }
     logL(std::format("MainWindow: Added {} autostart entries to table", entries.size()));
@@ -490,15 +500,13 @@ void MainWindow::createCpuLoadChart()
     series = new QSplineSeries();
     chart->addSeries(series);
     chart->setTitle(tr("CPU Load Graph"));
-    chart->setTitleFont(QFont("Ubuntu", 11));
-    //chart->setTitleBrush(QBrush(QColor("white")));
+    chart->setMinimumHeight(200);
+    //chart->setTitleBrush();
     axisX = new QValueAxis();
     axisY = new QValueAxis();
     axisY->setRange(0, 100);
     axisX->setGridLineVisible(false);
-    axisY->setGridLineColor(QColor("#3d3d3d"));
-    //axisX->setLabelsBrush(QBrush(QColor("white")));
-    //axisY->setLabelsBrush(QBrush(QColor("white")));
+
     axisY->setLabelFormat(QString("%d%%"));
     axisX->setLabelsVisible(false);
     chart->addAxis(axisX, Qt::AlignBottom);
@@ -506,7 +514,7 @@ void MainWindow::createCpuLoadChart()
 
     series->attachAxis(axisX);
     series->attachAxis(axisY);
-
+    series->setColor(QColor(76, 175, 80));
     chart->setBackgroundBrush(Qt::NoBrush);
     chart->setBackgroundVisible(false);
     chart->legend()->hide();
@@ -626,6 +634,32 @@ void MainWindow::onLanguageChanged(int index)
     autostartModel->setHorizontalHeaderLabels({tr("Name"), tr("Executable"), tr("Comment")});
     tempFilesModel->setHorizontalHeaderLabels({tr("File Path")});
     chart->setTitle(tr("CPU Load Graph"));
+}
+
+void MainWindow::loadTheme(const QString& themeName) {
+    QString path = QString(":/%1.qss").arg(themeName);
+    QFile styleFile(path);
+
+
+    if (styleFile.open(QIODevice::ReadOnly)) {
+        QString styleSheet = QString(styleFile.readAll());
+        qApp->setStyleSheet(styleSheet);
+        styleFile.close();
+
+        if (chart) {
+            QColor textColor = (themeName == "dark") ? Qt::white : Qt::black;
+            chart->setTitleBrush(QBrush(textColor));
+            axisY->setLabelsColor(textColor);
+        }
+    } else {
+        logE("Failed to load theme: " + path.toStdString());
+    }
+}
+
+void MainWindow::onThemeChanged(int index){
+    QString themeName = ui->themeComboBox->itemData(index).toString();
+    logF(themeName.toStdString());
+    loadTheme(themeName);
 }
 
 void MainWindow::showError(const QString &message)

@@ -101,7 +101,7 @@ std::vector<std::string> AutostartManager::listAutostartEntries(){
     return entries;
 }
 
-std::unordered_map<std::string, std::string> AutostartManager::getAutostartEntryInfo(const std::string& name){
+std::unordered_map<std::string, std::string> AutostartManager::getAutostartEntryInfo(const std::string& name) {
     std::unordered_map<std::string, std::string> entryInfo;
     std::filesystem::path dotDesktopFile = autostart_dir_ / (name + ".desktop");
 
@@ -116,25 +116,30 @@ std::unordered_map<std::string, std::string> AutostartManager::getAutostartEntry
         return entryInfo;
     }
 
-    std::regex namePattern(R"(Name\s*=\s*(?:")?([^"\n]*)(?:")?)");
-    std::regex execPattern(R"(Exec\s*=\s*(?:")?([^"\n]*)(?:")?)");
-    std::regex commentPattern(R"(Comment\s*=\s*(?:")?([^"\n]*)(?:")?)");
-    std::regex statusPattern(R"(X-GNOME-Autostart-enabled\s*=\s*(?:")?([^"\n]*)(?:")?)");
+    // Более гибкие регулярные выражения
+    std::regex namePattern(R"(^\s*Name\s*=\s*(?:")?([^"\n]*)(?:")?\s*$)", std::regex::icase);
+    std::regex execPattern(R"(^\s*Exec\s*=\s*(?:")?([^"\n]*)(?:")?\s*$)", std::regex::icase);
+    std::regex commentPattern(R"(^\s*Comment\s*=\s*(?:")?([^"\n]*)(?:")?\s*$)", std::regex::icase);
+    std::regex statusPattern(R"(^\s*X-GNOME-Autostart-enabled\s*=\s*(?:")?([^"\n]*)(?:")?\s*$)", std::regex::icase);
+
+    // Установка значений по умолчанию
+    entryInfo["Status"] = "true";
+    entryInfo["Comment"] = "No comment";  // Комментарий по умолчанию
 
     std::string line;
     while (std::getline(file, line)) {
         std::smatch matches;
         if (std::regex_search(line, matches, namePattern)) {
-            entryInfo["Name"] = matches[1];
+            entryInfo["Name"] = matches[1].str();
         }
         else if (std::regex_search(line, matches, execPattern)) {
-            entryInfo["Exec"] = matches[1];
+            entryInfo["Exec"] = matches[1].str();
         }
         else if (std::regex_search(line, matches, commentPattern)) {
-            entryInfo["Comment"] = matches[1];
+            entryInfo["Comment"] = matches[1].str();  // Перезапишет значение по умолчанию, если найдено
         }
         else if (std::regex_search(line, matches, statusPattern)) {
-            entryInfo["Status"] = matches[1];
+            entryInfo["Status"] = matches[1].str();
         }
     }
 

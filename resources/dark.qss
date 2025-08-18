@@ -1,0 +1,58 @@
+QMainWindow, QWidget, QDialog {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+
+QPushButton {
+    background-color: #3a3a3a;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 5px 10px;
+    color: #e0e0e0;
+}
+
+QPushButton:hover {
+    background-color: #4a4a4a;
+}
+
+
+QProgressBar {
+    border: 1px solid #444;
+    border-radius: 3px;
+    text-align: center;
+    background-color: #333;
+}
+
+QProgressBar::chunk {
+    background-color: #4CAF50;
+}
+
+
+QTableView {
+    background-color: #333;
+    gridline-color: #555;
+    color: #e0e0e0;
+}
+
+QHeaderView::section {
+    background-color: #3a3a3a;
+    color: #fff;
+    padding: 5px;
+}
+
+QTabBar::tab {
+    background: #3a3a3a;
+    color: #e0e0e0;
+    padding: 8px;
+}
+
+QTabBar::tab:selected {
+    background: #2d2d2d;
+    border-bottom: 2px solid #4CAF50;
+}
+
+
+QChart::title {
+    color: #fff
+}
