@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     logL("MainWindow: Initializing MainWindow");
     ui->setupUi(this);
-
+    config.load();
     ui->languageComboBox->addItem("English", "en_US");
     ui->languageComboBox->addItem("Русский", "ru_RU");
     ui->languageComboBox->addItem("Polski", "pl_PL");
@@ -22,7 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->themeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onThemeChanged);
     ui->themeComboBox->setCurrentIndex(0);
-
     servicesModel = std::make_unique<QStandardItemModel>(this);
     servicesModel->setColumnCount(3);
     servicesModel->setHorizontalHeaderLabels({tr("Service"), tr("Description"), tr("Status")});
@@ -77,6 +76,8 @@ MainWindow::MainWindow(QWidget *parent)
     resourceTimer->start(1000);
 
     createCpuLoadChart();
+    loadTheme(QString::fromStdString(config.getTheme()));
+    loadLanguage(QString::fromStdString(config.getLanguage()));
     chartUpdateTimer = std::make_unique<QTimer>(this);
     connect(chartUpdateTimer.get(), &QTimer::timeout, this, [this]() {
         Resmon::CPUStats current = Resmon::get_cpu_usage();
@@ -88,7 +89,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     populateServicesTable();
     populateAutostartTable();
-    loadTheme("dark");
     logL("MainWindow: MainWindow initialization completed");
 }
 
@@ -609,15 +609,20 @@ void MainWindow::updateInternetUsage(){
 
 
 
-void MainWindow::onLanguageChanged(int index)
+void MainWindow::loadLanguage(const QString &localeCode)
 {
-    QString localeCode = ui->languageComboBox->itemData(index).toString();
-
+    int index = ui->languageComboBox->findData(localeCode);
+    if (index != -1) {
+        const bool signalsBlocked = ui->languageComboBox->blockSignals(true);
+        ui->languageComboBox->setCurrentIndex(index);
+        ui->languageComboBox->blockSignals(signalsBlocked);
+    } else {
+        ui->languageComboBox->setCurrentIndex(0);
+    }
 
     logL(std::format("MainWindow: Changing language to: {}", localeCode.toStdString()));
 
     qApp->removeTranslator(m_translator.get());
-    //delete m_translator;
     m_translator = std::make_unique<QTranslator>(this);
 
     QString translationFile = QString(":translations/qtguiinterface_%1.qm").arg(localeCode);
@@ -631,23 +636,37 @@ void MainWindow::onLanguageChanged(int index)
     }
 
     ui->retranslateUi(this);
-
     servicesModel->setHorizontalHeaderLabels({tr("Service"), tr("Description"), tr("Status")});
     autostartModel->setHorizontalHeaderLabels({tr("Name"), tr("Executable"), tr("Comment")});
     tempFilesModel->setHorizontalHeaderLabels({tr("File Path")});
     chart->setTitle(tr("CPU Load Graph"));
 }
 
+void MainWindow::onLanguageChanged(int index)
+{
+    QString localeCode = ui->languageComboBox->itemData(index).toString();
+    loadLanguage(localeCode);
+
+    config.setLanguage(localeCode.toStdString());
+    config.save();
+}
+
 void MainWindow::loadTheme(const QString& themeName) {
     QString path = QString(":/%1.qss").arg(themeName);
     QFile styleFile(path);
-
+    int index = ui->themeComboBox->findData(themeName);
+    if (index != -1) {
+        ui->themeComboBox->setCurrentIndex(index);
+    } else {
+        ui->themeComboBox->setCurrentIndex(0);
+    }
 
     if (styleFile.open(QIODevice::ReadOnly)) {
         QString styleSheet = QString(styleFile.readAll());
         qApp->setStyleSheet(styleSheet);
         styleFile.close();
-
+        config.setTheme(themeName.toStdString());
+        config.save();
         if (chart) {
             QColor textColor = (themeName == "dark") ? Qt::white : Qt::black;
             chart->setTitleBrush(QBrush(textColor));

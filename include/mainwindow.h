@@ -33,6 +33,7 @@
 #include "ui_mainwindow.h"
 #include "../include/logger.hpp"
 #include "../include/resource_monitor.hpp"
+#include "../include/config_manager.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -89,6 +90,7 @@ private:
     void updateSystemInfo();
     void updateInternetUsage();
     void createCpuLoadChart();
+    void loadLanguage(const QString &localeCode);
     void updateChart(double usage);
     Resmon::CPUStats prevCpuStats;
     std::unique_ptr<QTimer> resourceTimer;
@@ -98,6 +100,7 @@ private:
     std::unique_ptr<QTranslator> m_translator;
     std::unique_ptr<QTimer> networkTimer;
     Resmon::NetworkStats lastNetworkStats;
+    Config config;
 };
 
 

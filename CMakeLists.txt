@@ -50,6 +50,7 @@ set(APP_SOURCES
     src/services.cpp
     src/temp_files.cpp
     src/autostart.cpp
+    src/config_manager.cpp
 )
 
 set(HEADERS
@@ -60,6 +61,7 @@ set(HEADERS
     include/temp_files.hpp
     include/autostart.hpp
     include/logger.hpp
+    include/config_manager.hpp
 )
 
 set(FORMS
