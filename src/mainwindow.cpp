@@ -60,7 +60,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->autostartTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
     ui->autostartTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
     ui->autostartTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-
+    ui->cpuGroupBox->setTitle(tr("CPU Usage (%1)").arg(QString::fromStdString(Resmon::get_cpu_name())));
+    ui->networkGroupBox->setTitle(tr("Network Usage (%1)").arg(QString::fromStdString(Resmon::get_network_interface())));
     prevCpuStats = Resmon::get_cpu_usage();
 
     ;
@@ -501,6 +502,7 @@ void MainWindow::createCpuLoadChart()
     chart->addSeries(series);
     chart->setTitle(tr("CPU Load Graph"));
     chart->setMinimumHeight(200);
+    chart->setMaximumHeight(300);
     //chart->setTitleBrush();
     axisX = new QValueAxis();
     axisY = new QValueAxis();

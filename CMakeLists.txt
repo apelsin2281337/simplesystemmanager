@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(SystemManager)
 
-# Qt path detection (keep your existing logic)
+
 file(GLOB QT_PATHS "/usr/local/Qt-*")
 if(QT_PATHS)
     list(SORT QT_PATHS)
@@ -14,20 +14,17 @@ else()
 endif()
 list(APPEND CMAKE_PREFIX_PATH "/usr")
 
-# Output directories (keep your existing setup)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_AUTOGEN_BUILD_DIR ${CMAKE_BINARY_DIR}/autogen)
 set(CMAKE_RCC_BUILD_DIR ${CMAKE_BINARY_DIR}/rcc)
 
-# Qt configuration
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR})
 
-# Find Qt components - ADD Wayland if available
 find_package(Qt6 REQUIRED COMPONENTS
     Core
     Gui
@@ -38,8 +35,6 @@ find_package(Qt6 REQUIRED COMPONENTS
 )
 
 set(CMAKE_CXX_STANDARD 23)
-
-# Add Wayland compiler definitions if available
 if(TARGET Qt6::WaylandClient)
     add_compile_definitions(QT_WAYLAND)
     message(STATUS "Wayland support enabled")
@@ -47,7 +42,6 @@ else()
     message(WARNING "Wayland support not found - building with X11 only")
 endif()
 
-# Your existing source files (keep unchanged)
 set(APP_SOURCES
     src/addautostartdialog.cpp
     src/logger.cpp
@@ -78,7 +72,6 @@ set(RESOURCES
     resources/themes.qrc
 )
 
-# Create executable
 add_executable(${PROJECT_NAME}
     src/main.cpp
     ${APP_SOURCES}
@@ -87,7 +80,6 @@ add_executable(${PROJECT_NAME}
     ${RESOURCES}
 )
 
-# Link libraries - ADD Wayland if available
 target_link_libraries(${PROJECT_NAME}
     Qt6::Core
     Qt6::Gui
@@ -102,10 +94,6 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(${PROJECT_NAME} systemd)
 endif()
-
-# Your existing translation, installation, and packaging setup
-# (keep all these sections unchanged)
-
 
 qt6_add_translation(QM_FILES
     translations/qtguiinterface_en_US.ts

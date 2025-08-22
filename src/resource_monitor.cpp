@@ -31,6 +31,36 @@ std::vector<std::string> Resmon::get_cpu_stats() {
     return stats;
 }
 
+std::string Resmon::get_cpu_name() {
+    std::lock_guard<std::mutex> lock(statsMutex_);
+    std::ifstream file("/proc/cpuinfo");
+    std::string line;
+    std::string result = "Unknown CPU";
+
+    while (std::getline(file, line)) {
+        if (line.find("model name") != std::string::npos) {
+            size_t colon_pos = line.find(":");
+            if (colon_pos != std::string::npos) {
+                result = line.substr(colon_pos + 1);
+                size_t first_non_ws = result.find_first_not_of(" \t");
+                if (first_non_ws != std::string::npos) {
+                    result = result.substr(first_non_ws);
+                }
+
+                size_t last_non_ws = result.find_last_not_of(" \t");
+                if (last_non_ws != std::string::npos) {
+                    result = result.substr(0, last_non_ws + 1);
+                }
+
+                break;
+            }
+        }
+    }
+
+    logL(result);
+    return result;
+}
+
 std::vector<std::string> Resmon::get_mem_stats() {
     std::lock_guard<std::mutex> lock(statsMutex_);
     std::ifstream file("/proc/meminfo");
@@ -102,6 +132,37 @@ Resmon::MemStats Resmon::get_mem_usage() {
     return result;
 }
 
+
+std::string Resmon::get_network_interface() {
+    std::ifstream file("/proc/net/dev");
+    if (!file.is_open()) {
+        logE("Failed to open /proc/net/dev");
+        return "";
+    }
+
+    std::string line;
+    std::getline(file, line);
+    std::getline(file, line);
+
+    while (std::getline(file, line)) {
+        if (line.find("lo:") != std::string::npos || line.find("docker") != std::string::npos ||
+            line.find("virbr") != std::string::npos || line.find("veth") != std::string::npos) {
+            continue;
+        }
+
+        std::istringstream iss(line);
+        std::string interface;
+        iss >> interface;
+
+        if (interface.back() == ':') {
+            interface.pop_back();
+            return interface;
+        }
+    }
+
+    return "";
+}
+
 Resmon::NetworkStats Resmon::get_internet_usage() {
     std::lock_guard<std::mutex> lock(statsMutex_);
     NetworkStats stats = {0, 0};
@@ -110,23 +171,38 @@ Resmon::NetworkStats Resmon::get_internet_usage() {
 
     std::ifstream file("/proc/net/dev");
     if (!file.is_open()) {
+        logE("Failed to open /proc/net/dev");
         return stats;
     }
 
     std::string line;
+    std::getline(file, line);
+    std::getline(file, line);
+
     while (std::getline(file, line)) {
         if (line.find("lo:") == 0 || line.find("docker") != std::string::npos ||
             line.find("virbr") != std::string::npos || line.find("veth") != std::string::npos) {
             continue;
         }
 
-        size_t colon_pos = line.find(":");
-        if (colon_pos != std::string::npos) {
-            std::string data = line.substr(colon_pos + 1);
-            sscanf(data.c_str(), "%llu %*u %*u %*u %*u %*u %*u %*u %llu", &rx_bytes, &tx_bytes);
+        std::istringstream iss(line);
+        std::string interface;
+        unsigned long long rbytes, tbytes;
+
+        iss >> interface;
+        if (interface.back() == ':') {
+            interface.pop_back();
+            iss >> rbytes;
+            for (int i = 0; i < 7; ++i) {
+                unsigned long long dummy;
+                iss >> dummy;
+            }
+            iss >> tbytes;
+
+            rx_bytes += rbytes;
+            tx_bytes += tbytes;
         }
     }
-    file.close();
 
     if (last_rx_bytes > 0 && last_tx_bytes > 0) {
         stats.rx_speed = (rx_bytes - last_rx_bytes) / 1024;
@@ -138,5 +214,3 @@ Resmon::NetworkStats Resmon::get_internet_usage() {
 
     return stats;
 }
-
-

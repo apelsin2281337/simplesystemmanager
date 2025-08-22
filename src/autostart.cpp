@@ -116,15 +116,14 @@ std::unordered_map<std::string, std::string> AutostartManager::getAutostartEntry
         return entryInfo;
     }
 
-    // Более гибкие регулярные выражения
     std::regex namePattern(R"(^\s*Name\s*=\s*(?:")?([^"\n]*)(?:")?\s*$)", std::regex::icase);
     std::regex execPattern(R"(^\s*Exec\s*=\s*(?:")?([^"\n]*)(?:")?\s*$)", std::regex::icase);
     std::regex commentPattern(R"(^\s*Comment\s*=\s*(?:")?([^"\n]*)(?:")?\s*$)", std::regex::icase);
     std::regex statusPattern(R"(^\s*X-GNOME-Autostart-enabled\s*=\s*(?:")?([^"\n]*)(?:")?\s*$)", std::regex::icase);
 
-    // Установка значений по умолчанию
+
     entryInfo["Status"] = "true";
-    entryInfo["Comment"] = "No comment";  // Комментарий по умолчанию
+
 
     std::string line;
     while (std::getline(file, line)) {
@@ -136,7 +135,7 @@ std::unordered_map<std::string, std::string> AutostartManager::getAutostartEntry
             entryInfo["Exec"] = matches[1].str();
         }
         else if (std::regex_search(line, matches, commentPattern)) {
-            entryInfo["Comment"] = matches[1].str();  // Перезапишет значение по умолчанию, если найдено
+            entryInfo["Comment"] = matches[1].str();
         }
         else if (std::regex_search(line, matches, statusPattern)) {
             entryInfo["Status"] = matches[1].str();

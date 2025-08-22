@@ -76,8 +76,10 @@ public:
     static DiskStats get_disk_usage();
 
     static NetworkStats get_internet_usage();
+    static std::string get_network_interface();
 
     static CPUStats get_cpu_usage();
+    static std::string get_cpu_name();
 
     static MemStats get_mem_usage();
 };

@@ -66,6 +66,12 @@
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
            <widget class="QGroupBox" name="cpuGroupBox">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>150</height>
+             </size>
+            </property>
             <property name="title">
              <string>CPU Usage</string>
             </property>
@@ -99,6 +105,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
              <widget class="QGroupBox" name="swapGroupBox">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>150</height>
+               </size>
+              </property>
               <property name="title">
                <string>Swap Usage</string>
               </property>
@@ -136,6 +148,12 @@
             </item>
             <item>
              <widget class="QGroupBox" name="ramGroupBox">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>150</height>
+               </size>
+              </property>
               <property name="title">
                <string>RAM Usage</string>
               </property>
@@ -168,6 +186,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
             <item>
              <widget class="QGroupBox" name="diskGroupBox">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>150</height>
+               </size>
+              </property>
               <property name="title">
                <string>Disk Usage</string>
               </property>
@@ -202,6 +226,12 @@
             </item>
             <item>
              <widget class="QGroupBox" name="networkGroupBox">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>150</height>
+               </size>
+              </property>
               <property name="title">
                <string>Network Usage</string>
               </property>
