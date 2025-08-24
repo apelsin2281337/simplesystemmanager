@@ -3,11 +3,11 @@
 A system management tool with a Qt GUI interface.
 
 ## Requirements
-- Qt 6.9
+- Qt 6.9 (nice)
 - Systemd development packages
 - Root privileges
 - C++23 compatible compiler
-- Will to live (optional - "as if I have it, and I created this thing")
+- Will to live (optional, like as if I have it, and I created this thing)
 
 ## Building
 ```bash
