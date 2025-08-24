@@ -42,6 +42,7 @@ bool AutostartManager::removeAutostartEntry(const std::string& name){
         logE(std::format("Autostart: File {0} removal failed", desktop_file.string()));
         return false;
     }
+    return true;
 }
 
 bool AutostartManager::setAutostartEntryEnabledStatus(const std::string& name, bool status){

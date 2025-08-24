@@ -10,18 +10,13 @@ MainWindow::MainWindow(QWidget *parent)
     logL("MainWindow: Initializing MainWindow");
     ui->setupUi(this);
     config.load();
-    ui->languageComboBox->addItem("English", "en_US");
-    ui->languageComboBox->addItem("Русский", "ru_RU");
-    ui->languageComboBox->addItem("Polski", "pl_PL");
-    connect(ui->languageComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &MainWindow::onLanguageChanged);
-    ui->languageComboBox->setCurrentIndex(0);
 
     ui->themeComboBox->addItem(tr("Dark Theme"), "dark");
     ui->themeComboBox->addItem(tr("Light Theme"), "light");
     connect(ui->themeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onThemeChanged);
     ui->themeComboBox->setCurrentIndex(0);
+
     servicesModel = std::make_unique<QStandardItemModel>(this);
     servicesModel->setColumnCount(3);
     servicesModel->setHorizontalHeaderLabels({tr("Service"), tr("Description"), tr("Status")});
@@ -59,8 +54,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->autostartTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
     ui->autostartTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
     ui->autostartTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->cpuGroupBox->setTitle(tr("CPU Usage (%1)").arg(QString::fromStdString(Resmon::get_cpu_name())));
-    ui->networkGroupBox->setTitle(tr("Network Usage (%1)").arg(QString::fromStdString(Resmon::get_network_interface())));
     prevCpuStats = Resmon::get_cpu_usage();
 
     ;
@@ -77,7 +70,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     createCpuLoadChart();
     loadTheme(QString::fromStdString(config.getTheme()));
-    loadLanguage(QString::fromStdString(config.getLanguage()));
     chartUpdateTimer = std::make_unique<QTimer>(this);
     connect(chartUpdateTimer.get(), &QTimer::timeout, this, [this]() {
         Resmon::CPUStats current = Resmon::get_cpu_usage();
@@ -89,6 +81,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     populateServicesTable();
     populateAutostartTable();
+    ui->cpuGroupBox->setTitle(tr("CPU Usage (%1)").arg(QString::fromStdString(Resmon::get_cpu_name())));
+    ui->networkGroupBox->setTitle(tr("Network Usage (%1)").arg(QString::fromStdString(Resmon::get_network_interface())));
     logL("MainWindow: MainWindow initialization completed");
 }
 
@@ -605,50 +599,6 @@ void MainWindow::updateInternetUsage(){
     };
     ui->downloadLabel->setText(tr("Download: %1").arg(formatSpeed(network.rx_speed)));
     ui->uploadLabel->setText(tr("Upload: %1").arg(formatSpeed(network.tx_speed)));
-}
-
-
-
-void MainWindow::loadLanguage(const QString &localeCode)
-{
-    int index = ui->languageComboBox->findData(localeCode);
-    if (index != -1) {
-        const bool signalsBlocked = ui->languageComboBox->blockSignals(true);
-        ui->languageComboBox->setCurrentIndex(index);
-        ui->languageComboBox->blockSignals(signalsBlocked);
-    } else {
-        ui->languageComboBox->setCurrentIndex(0);
-    }
-
-    logL(std::format("MainWindow: Changing language to: {}", localeCode.toStdString()));
-
-    qApp->removeTranslator(m_translator.get());
-    m_translator = std::make_unique<QTranslator>(this);
-
-    QString translationFile = QString(":translations/qtguiinterface_%1.qm").arg(localeCode);
-    logL(std::format("MainWindow: Loading translation file: {}", translationFile.toStdString()));
-
-    if (m_translator->load(translationFile)) {
-        qApp->installTranslator(m_translator.get());
-        logL("MainWindow: Translation loaded successfully");
-    } else {
-        logE("MainWindow: Failed to load translation");
-    }
-
-    ui->retranslateUi(this);
-    servicesModel->setHorizontalHeaderLabels({tr("Service"), tr("Description"), tr("Status")});
-    autostartModel->setHorizontalHeaderLabels({tr("Name"), tr("Executable"), tr("Comment")});
-    tempFilesModel->setHorizontalHeaderLabels({tr("File Path")});
-    chart->setTitle(tr("CPU Load Graph"));
-}
-
-void MainWindow::onLanguageChanged(int index)
-{
-    QString localeCode = ui->languageComboBox->itemData(index).toString();
-    loadLanguage(localeCode);
-
-    config.setLanguage(localeCode.toStdString());
-    config.save();
 }
 
 void MainWindow::loadTheme(const QString& themeName) {

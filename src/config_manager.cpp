@@ -11,8 +11,6 @@ bool Config::load() {
         file >> data_;
         file.close();
 
-
-        language_ = data_.value("language", "en_");
         theme_ = data_.value("theme", "dark");
 
         return true;
@@ -25,7 +23,6 @@ bool Config::load() {
 
 bool Config::save() {
     try {
-        data_["language"] = language_;
         data_["theme"] = theme_;
 
         std::ofstream file(filename_);
@@ -45,6 +42,5 @@ bool Config::save() {
 
 void Config::clear() {
     data_.clear();
-    language_ = "en";
     theme_ = "dark";
 }

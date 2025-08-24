@@ -64,7 +64,6 @@ private slots:
     void on_updateEntriesButton_clicked();
     void on_selectAllFilesButton_clicked();
     void on_clearSelectedFilesButton_clicked();
-    void onLanguageChanged(int index);
     void loadTheme(const QString& themeName);
     void onThemeChanged(int index);
 

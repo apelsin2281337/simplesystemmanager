@@ -9,12 +9,11 @@ class Config {
 private:
     std::string filename_;
     nlohmann::json data_;
-    std::string language_;
     std::string theme_;
 
 public:
     Config(const std::string& configFile = "config.json")
-        : filename_(configFile), language_("en_US"), theme_("dark") {
+        : filename_(configFile), theme_("dark") {
         load();
     }
 
@@ -27,10 +26,8 @@ public:
 
     bool save();
 
-    const std::string& getLanguage() const { return language_; }
     const std::string& getTheme() const { return theme_; }
 
-    void setLanguage(const std::string& language) { language_ = language; }
     void setTheme(const std::string& theme) { theme_ = theme; }
 
     bool has(const std::string& key) const {

@@ -69,7 +69,6 @@ set(FORMS
 )
 
 set(RESOURCES
-    resources/translations.qrc
     resources/icon.qrc
     resources/themes.qrc
 )
@@ -96,13 +95,6 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(${PROJECT_NAME} systemd)
 endif()
-
-qt6_add_translation(QM_FILES
-    translations/qtguiinterface_en_US.ts
-    translations/qtguiinterface_ru_RU.ts
-    translations/qtguiinterface_pl_PL.ts
-)
-add_custom_target(translations ALL DEPENDS ${QM_FILES})
 
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
