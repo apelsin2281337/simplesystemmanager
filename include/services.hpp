@@ -3,7 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-
+#include <cstring>
+#include <unistd.h>
 
 #include "../include/logger.hpp"
 

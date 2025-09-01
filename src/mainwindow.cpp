@@ -56,7 +56,33 @@ MainWindow::MainWindow(QWidget *parent)
     ui->autostartTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     prevCpuStats = Resmon::get_cpu_usage();
 
-    ;
+    taskManagerModel = std::make_unique<QStandardItemModel>(this);
+    taskManagerModel->setColumnCount(5);
+    taskManagerModel->setVerticalHeaderLabels({"PID", "Name", "CPU Load", "PRAM", "VRAM"});
+    taskManagerProxyModel = std::make_unique<QSortFilterProxyModel>(this);
+    taskManagerProxyModel->setSourceModel(taskManagerModel.get());
+    taskManagerProxyModel-> setFilterCaseSensitivity(Qt::CaseInsensitive);
+
+    taskManagerModel = std::make_unique<QStandardItemModel>(this);
+    taskManagerModel->setColumnCount(5);
+    taskManagerModel->setHorizontalHeaderLabels({"PID", "Name", "CPU Load", "PRAM", "VRAM"});
+
+    taskManagerProxyModel = std::make_unique<QSortFilterProxyModel>(this);
+    taskManagerProxyModel->setSourceModel(taskManagerModel.get());
+    taskManagerProxyModel->setFilterKeyColumn(1);
+    taskManagerProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    taskManagerProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+
+    ui->taskManagerTable->setModel(taskManagerProxyModel.get()); // Use proxy model, not source model
+    //ui->taskManagerTable->setSortingEnabled(true);
+    ui->taskManagerTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents); // PID
+    ui->taskManagerTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);          // Name
+    ui->taskManagerTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents); // CPU Load
+    ui->taskManagerTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents); // PRAM
+    ui->taskManagerTable->horizontalHeader()->setSectionResizeMode(4, QHeaderView::ResizeToContents); // VRAM
+
+    ui->taskManagerTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+
     resourceTimer = std::make_unique<QTimer>(this);
     connect(resourceTimer.get(), &QTimer::timeout, this, [this]() {
         updateCpuUsage();
@@ -64,6 +90,9 @@ MainWindow::MainWindow(QWidget *parent)
         updateRamUsage();
         updateDiskUsage();
         updateInternetUsage();
+        populateServicesTable();
+        populateAutostartTable();
+        populateTaskManager();
     });
     //не менять сломается инет
     resourceTimer->start(1000);
@@ -79,10 +108,13 @@ MainWindow::MainWindow(QWidget *parent)
     });
     chartUpdateTimer->start(700);
 
+
+    populateTaskManager();
     populateServicesTable();
     populateAutostartTable();
     ui->cpuGroupBox->setTitle(tr("CPU Usage (%1)").arg(QString::fromStdString(Resmon::get_cpu_name())));
     ui->networkGroupBox->setTitle(tr("Network Usage (%1)").arg(QString::fromStdString(Resmon::get_network_interface())));
+
     logL("MainWindow: MainWindow initialization completed");
 }
 
@@ -122,6 +154,39 @@ void MainWindow::populateServicesTable()
         }
     }
     logL(std::format("MainWindow: Added {} services to table", services.size()));
+}
+
+void MainWindow::populateTaskManager()
+{
+    logL("MainWindow: Populating Task Manager");
+
+    taskManagerModel->removeRows(0, taskManagerModel->rowCount());
+
+    auto tasks = TaskManager::getAllProcessesInfo();
+
+    //taskManagerModel->setRowCount(tasks.size());
+
+    for (int i = 0; i < tasks.size(); ++i) {
+        const auto& task = tasks[i];
+
+        QStandardItem *pidItem = new QStandardItem(QString::fromStdString(std::to_string(task.pid)));
+        QStandardItem *nameItem = new QStandardItem(QString::fromStdString(task.name));
+        QStandardItem *cpuloadItem = new QStandardItem(QString::fromStdString(std::to_string(task.cpu_usage)));
+        QStandardItem *PRAMItem = new QStandardItem(QString::fromStdString(std::to_string(task.memory_rss_kb)));
+        QStandardItem *VRAMItem = new QStandardItem(QString::fromStdString(std::to_string(task.memory_vsize_kb)));
+
+        QList<QStandardItem*> rowItems = {pidItem, nameItem, cpuloadItem, PRAMItem, VRAMItem};
+        for (auto& item : rowItems) {
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+            item->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        }
+
+        nameItem->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+        taskManagerModel->appendRow(rowItems);
+    }
+
+    logL(std::format("MainWindow: Added {} tasks to table", tasks.size()));
 }
 
 void MainWindow::populateAutostartTable()
@@ -348,6 +413,19 @@ void MainWindow::on_clearSelectedFilesButton_clicked()
     ui->tempFilesTable->clearSelection();
 }
 
+void MainWindow::on_catButton_clicked(){
+    ui->catButton->setMaximumWidth(64);
+    ui->catButton->setText("");
+
+    const int maxCats = 34;
+    int randomIndex = QRandomGenerator::global()->bounded(maxCats);
+
+    QString imagePath = QString(":cats/cat%1.jpg").arg(randomIndex);
+    logL(imagePath.toStdString());
+    ui->catButton->setIcon(QIcon(imagePath));
+}
+
+
 void MainWindow::on_deleteSelectedFilesButton_clicked()
 {
     QModelIndexList selected = ui->tempFilesTable->selectionModel()->selectedRows();
@@ -392,6 +470,13 @@ void MainWindow::on_searchServicesTextChanged(const QString &text)
     logL(std::format("MainWindow: Filtering services with text: {}", text.toStdString()));
     servicesProxyModel->setFilterKeyColumn(-1);
     servicesProxyModel->setFilterFixedString(text);
+}
+
+void MainWindow::on_searchTaskLineEdit_textChanged(const QString &text)
+{
+    logL(std::format("MainWindow: Filtering tasks with text: {}", text.toStdString()));
+    taskManagerProxyModel->setFilterKeyColumn(-1);
+    taskManagerProxyModel->setFilterFixedString(text);
 }
 
 void MainWindow::on_addEntryButton_clicked()
@@ -486,6 +571,101 @@ void MainWindow::on_updateEntriesButton_clicked()
     logL("MainWindow: Refreshing autostart entries");
     populateAutostartTable();
     showInfo(tr("Autostart Entries has been reloaded!"));
+}
+
+
+void MainWindow::on_startProcessButton_clicked() {
+    StartNewProcess procDialog(this);
+    procDialog.exec();
+    QString command = procDialog.getCommand();
+    bool isRoot = procDialog.isExecuteAsRoot();
+
+    if (command.isEmpty()) {
+        return;
+    }
+
+    QProcess process;
+    QStringList arguments;
+
+    if (isRoot) {
+        arguments << "-E" << command;
+        process.start("sudo", arguments);
+    } else {
+        arguments << "-u" << "#1000" << "sh" << "-c" << command;
+        process.start("sudo", arguments);
+    }
+
+    if (!process.waitForStarted()) {
+        showError("Error. Failed to start process!");
+        return;
+    }
+
+    //process.waitForFinished();
+
+    if (process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0) {
+        showInfo("Process executed successfully!");
+    } else {
+        QMessageBox::critical(this, "Error",
+                              QString("Process failed with exit code: %1\nError: %2")
+                                  .arg(process.exitCode())
+                                  .arg(QString(process.readAllStandardError())));
+    }
+}
+
+void MainWindow::on_stopProcessButton_clicked() {
+    QModelIndexList selected = ui->taskManagerTable->selectionModel()->selectedRows();
+    if (selected.isEmpty()) {
+        logE("MainWindow: No process was selected to stop");
+        showError(tr("Please select a process first!"));
+        return;
+    }
+
+    QString pidStr = taskManagerModel->item(selected.first().row(), 0)->text();
+    bool ok;
+    int pid = pidStr.toInt(&ok);
+
+    if (!ok || pid <= 0) {
+        logE(("MainWindow: Invalid PID format: " + pidStr).toStdString());
+        showError(tr("Invalid process ID"));
+        return;
+    }
+
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this,
+        tr("Confirm Process Termination"),
+        tr("Are you sure you want to terminate process %1?").arg(pid),
+        QMessageBox::Yes | QMessageBox::No
+        );
+
+    if (reply != QMessageBox::Yes) {
+        return;
+    }
+
+    QProcess process;
+    QStringList args;
+    args << "-15" << QString::number(pid);
+
+    process.start("kill", args);
+
+    if (!process.waitForFinished(2000)) {
+        logL("MainWindow: Process didn't respond to SIGTERM, trying SIGKILL");
+
+        QProcess killProcess;
+        QStringList killArgs;
+        killArgs << "-9" << QString::number(pid);
+        killProcess.start("kill", killArgs);
+        killProcess.waitForFinished(1000);
+    }
+
+    if (process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0) {
+        logL(("MainWindow: Successfully terminated process: " + pidStr).toStdString());
+        showInfo(tr("Process terminated successfully"));
+    } else {
+        logE(("MainWindow: Failed to terminate process: " + pidStr).toStdString());
+        showError(tr("Failed to terminate process"));
+    }
+
+    populateTaskManager();
 }
 
 void MainWindow::createCpuLoadChart()

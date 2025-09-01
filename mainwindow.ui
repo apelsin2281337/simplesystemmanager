@@ -11,14 +11,18 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>System Management Tool</string>
+   <string>System Management</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources/icon.qrc">
+    <normaloff>:/icon.ico</normaloff>:/icon.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_9">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_9">
       <item>
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="themeLabel">
         <property name="text">
          <string>Theme</string>
         </property>
@@ -40,12 +44,44 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QLabel" name="catGeneratorLabel">
+        <property name="text">
+         <string>Cat Generator</string>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::TextInteractionFlag::NoTextInteraction</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="catButton">
+        <property name="maximumSize">
+         <size>
+          <width>256</width>
+          <height>64</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>I Shall Become a Cat</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>64</width>
+          <height>64</height>
+         </size>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabResources">
        <attribute name="title">
@@ -255,6 +291,45 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tabTaskManager">
+       <attribute name="title">
+        <string>TaskManager?</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_12">
+          <item>
+           <widget class="QLineEdit" name="searchTaskLineEdit"/>
+          </item>
+          <item>
+           <widget class="QTableView" name="taskManagerTable">
+            <attribute name="verticalHeaderVisible">
+             <bool>true</bool>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <widget class="QPushButton" name="startProcessButton">
+              <property name="text">
+               <string>Start Process</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="stopProcessButton">
+              <property name="text">
+               <string>Stop Process</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tabServices">
        <attribute name="title">
         <string>Services</string>
@@ -413,6 +488,8 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources/icon.qrc"/>
+ </resources>
  <connections/>
 </ui>

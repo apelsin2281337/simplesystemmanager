@@ -20,6 +20,8 @@
 #include <QTextStream>
 #include <QtGlobal>
 #include <QIcon>
+#include <QRandomGenerator>
+#include <QProcess>
 
 
 #include <memory>
@@ -34,6 +36,8 @@
 #include "../include/logger.hpp"
 #include "../include/resource_monitor.hpp"
 #include "../include/config_manager.hpp"
+#include "../include/task_manager.hpp"
+#include "../include/start_new_process_dialog.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -58,13 +62,16 @@ private slots:
     void on_refreshServicesButton_clicked();
     void on_deleteSelectedFilesButton_clicked();
     void on_searchServicesTextChanged(const QString &text);
+    void on_searchTaskLineEdit_textChanged(const QString &text);
     void on_addEntryButton_clicked();
     void on_enableEntryButton_clicked();
     void on_removeEntryButton_clicked();
     void on_updateEntriesButton_clicked();
     void on_selectAllFilesButton_clicked();
     void on_clearSelectedFilesButton_clicked();
-    void loadTheme(const QString& themeName);
+    void on_startProcessButton_clicked();
+    void on_stopProcessButton_clicked();
+    void on_catButton_clicked();
     void onThemeChanged(int index);
 
 private:
@@ -73,12 +80,16 @@ private:
     std::unique_ptr<QSortFilterProxyModel> servicesProxyModel;
     std::unique_ptr<QStandardItemModel> tempFilesModel;
     std::unique_ptr<QStandardItemModel> autostartModel;
+    std::unique_ptr<QStandardItemModel> taskManagerModel;
+    std::unique_ptr<QSortFilterProxyModel> taskManagerProxyModel;
     QChart* chart = nullptr;
     QSplineSeries* series = nullptr;
     QValueAxis* axisX = nullptr;
     QValueAxis* axisY = nullptr;
     QChartView* chartView = nullptr;
+
     void populateServicesTable();
+    void populateTaskManager();
     void populateAutostartTable();
     void showError(const QString &message);
     void showInfo(const QString &message);
@@ -90,6 +101,7 @@ private:
     void updateInternetUsage();
     void createCpuLoadChart();
     void loadLanguage(const QString &localeCode);
+    void loadTheme(const QString& themeName);
     void updateChart(double usage);
     Resmon::CPUStats prevCpuStats;
     std::unique_ptr<QTimer> resourceTimer;

@@ -21,8 +21,13 @@ int main(int argc, char *argv[])
 
         return 1;
     }
+    if (qEnvironmentVariableIsEmpty("XDG_RUNTIME_DIR")) {
+        QString runtimeDir = QString("/run/user/%1").arg(getuid());
+        if (QDir(runtimeDir).exists()) {
+            qputenv("XDG_RUNTIME_DIR", runtimeDir.toUtf8());
+        }
+    }
     MainWindow w;
-    w.setWindowIcon(QIcon(":/icon.ico"));
     //w.setFixedSize(800,700);
     w.show();
     return a.exec();

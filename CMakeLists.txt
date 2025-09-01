@@ -30,8 +30,8 @@ find_package(Qt6 REQUIRED COMPONENTS
     Gui
     Widgets
     Charts
-    LinguistTools
     WaylandClient
+    Multimedia
 )
 
 set(CMAKE_CXX_STANDARD 23)
@@ -51,6 +51,8 @@ set(APP_SOURCES
     src/temp_files.cpp
     src/autostart.cpp
     src/config_manager.cpp
+    src/task_manager.cpp
+    src/start_new_process_dialog.cpp
 )
 
 set(HEADERS
@@ -62,6 +64,8 @@ set(HEADERS
     include/autostart.hpp
     include/logger.hpp
     include/config_manager.hpp
+    include/task_manager.hpp
+    include/start_new_process_dialog.hpp
 )
 
 set(FORMS
@@ -71,6 +75,7 @@ set(FORMS
 set(RESOURCES
     resources/icon.qrc
     resources/themes.qrc
+    resources/haha.qrc
 )
 
 add_executable(${PROJECT_NAME}
@@ -79,6 +84,8 @@ add_executable(${PROJECT_NAME}
     ${HEADERS}
     ${FORMS}
     ${RESOURCES}
+
+
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -86,6 +93,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt6::Gui
     Qt6::Widgets
     Qt6::Charts
+    Qt6::Multimedia
 )
 
 if(TARGET Qt6::WaylandClient)

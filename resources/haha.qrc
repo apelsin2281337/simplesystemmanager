@@ -1,0 +1,39 @@
+<RCC>
+    <qresource prefix="/">
+        <file>cats/cat0.jpg</file>
+        <file>cats/cat1.jpg</file>
+        <file>cats/cat2.jpg</file>
+        <file>cats/cat3.jpg</file>
+        <file>cats/cat4.jpg</file>
+        <file>cats/cat5.jpg</file>
+        <file>cats/cat6.jpg</file>
+        <file>cats/cat7.jpg</file>
+        <file>cats/cat8.jpg</file>
+        <file>cats/cat9.jpg</file>
+        <file>cats/cat10.jpg</file>
+        <file>cats/cat11.jpg</file>
+        <file>cats/cat12.jpg</file>
+        <file>cats/cat13.jpg</file>
+        <file>cats/cat14.jpg</file>
+        <file>cats/cat15.jpg</file>
+        <file>cats/cat16.jpg</file>
+        <file>cats/cat17.jpg</file>
+        <file>cats/cat18.jpg</file>
+        <file>cats/cat19.jpg</file>
+        <file>cats/cat20.jpg</file>
+        <file>cats/cat21.jpg</file>
+        <file>cats/cat22.jpg</file>
+        <file>cats/cat23.jpg</file>
+        <file>cats/cat24.jpg</file>
+        <file>cats/cat25.jpg</file>
+        <file>cats/cat26.jpg</file>
+        <file>cats/cat27.jpg</file>
+        <file>cats/cat28.jpg</file>
+        <file>cats/cat29.jpg</file>
+        <file>cats/cat30.jpg</file>
+        <file>cats/cat31.jpg</file>
+        <file>cats/cat32.jpg</file>
+        <file>cats/cat33.jpg</file>
+        <file>cats/cat34.jpg</file>
+    </qresource>
+</RCC>
