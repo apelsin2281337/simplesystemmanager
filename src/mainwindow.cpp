@@ -63,10 +63,6 @@ MainWindow::MainWindow(QWidget *parent)
     taskManagerProxyModel->setSourceModel(taskManagerModel.get());
     taskManagerProxyModel-> setFilterCaseSensitivity(Qt::CaseInsensitive);
 
-    taskManagerModel = std::make_unique<QStandardItemModel>(this);
-    taskManagerModel->setColumnCount(5);
-    taskManagerModel->setHorizontalHeaderLabels({"PID", "Name", "CPU Load", "PRAM", "VRAM"});
-
     taskManagerProxyModel = std::make_unique<QSortFilterProxyModel>(this);
     taskManagerProxyModel->setSourceModel(taskManagerModel.get());
     taskManagerProxyModel->setFilterKeyColumn(1);
@@ -90,9 +86,6 @@ MainWindow::MainWindow(QWidget *parent)
         updateRamUsage();
         updateDiskUsage();
         updateInternetUsage();
-        populateServicesTable();
-        populateAutostartTable();
-        populateTaskManager();
     });
     //не менять сломается инет
     resourceTimer->start(1000);
@@ -619,8 +612,10 @@ void MainWindow::on_stopProcessButton_clicked() {
         showError(tr("Please select a process first!"));
         return;
     }
+    QModelIndex sourceIndex = taskManagerProxyModel->mapToSource(selected.first());
 
-    QString pidStr = taskManagerModel->item(selected.first().row(), 0)->text();
+    QString pidStr = taskManagerModel->item(sourceIndex.row(), 0)->text();
+    logF(pidStr.toStdString());
     bool ok;
     int pid = pidStr.toInt(&ok);
 
