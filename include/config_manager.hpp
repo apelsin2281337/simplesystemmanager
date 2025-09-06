@@ -1,9 +1,8 @@
 #pragma once
-#include "../include/json.hpp"
-#include "../include/logger.hpp"
-#include <iostream>
-#include <fstream>
 #include <string>
+#include "../include/json.hpp"
+
+
 
 class Config {
 private:

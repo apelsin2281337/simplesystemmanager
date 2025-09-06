@@ -1,3 +1,16 @@
+
+
+#include <iostream>
+#include <filesystem>
+#include <vector>
+#include <unistd.h>
+#include <pwd.h>
+#include <cstdlib>
+
+
+
+//#include "mainwindow.h"
+#include "../include/logger.hpp"
 #include "../include/temp_files.hpp"
 
 

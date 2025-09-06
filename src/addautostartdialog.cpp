@@ -1,4 +1,11 @@
 #include "../include/addautostartdialog.hpp"
+#include <QDialog>
+#include <QLineEdit>
+#include <QFormLayout>
+#include <QDialogButtonBox>
+
+
+#include "../include/logger.hpp"
 
 AddAutostartDialog::AddAutostartDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("Add Autostart Entry!"));
@@ -24,3 +31,7 @@ AddAutostartDialog::AddAutostartDialog(QWidget *parent) : QDialog(parent) {
     setFixedSize(400, 200);
     logL("Add Dialog Window Invoked!");
 }
+
+QString AddAutostartDialog::getName() const { return nameEdit->text(); }
+QString AddAutostartDialog::getExec() const { return execEdit->text(); }
+QString AddAutostartDialog::getComment() const { return commentEdit->text(); }

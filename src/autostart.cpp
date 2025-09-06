@@ -1,4 +1,15 @@
 #include "../include/autostart.hpp"
+#include "../include/logger.hpp"
+
+
+#include <iostream>
+#include <filesystem>
+#include <fstream>
+#include <vector>
+#include <unordered_map>
+#include <regex>
+
+
 
 std::filesystem::path autostart_dir_= "/etc/xdg/autostart";
 

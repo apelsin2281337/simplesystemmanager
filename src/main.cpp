@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QTranslator>
 #include <QLocale>
+#include <QDir>
 
 #include <unistd.h>
 
@@ -28,7 +29,6 @@ int main(int argc, char *argv[])
         }
     }
     MainWindow w;
-    //w.setFixedSize(800,700);
     w.show();
     return a.exec();
 }

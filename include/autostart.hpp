@@ -7,9 +7,6 @@
 #include <regex>
 
 
-#include <QDebug>
-
-
 #include "../include/logger.hpp"
 
 class AutostartManager{

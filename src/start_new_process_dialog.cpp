@@ -1,4 +1,14 @@
 #include "../include/start_new_process_dialog.hpp"
+#include "../include/logger.hpp"
+
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QDialogButtonBox>
+#include <QVBoxLayout>
+#include <iostream>
+
+
 
 StartNewProcess::StartNewProcess(QWidget *parent) : QDialog(parent) {
     setWindowTitle("Start New Process!");
@@ -21,4 +31,12 @@ StartNewProcess::StartNewProcess(QWidget *parent) : QDialog(parent) {
 
     setFixedSize(400, 200);
     logL("Start new process Window Invoked!");
+}
+
+QString StartNewProcess::getCommand() const {
+    return command->text();
+}
+
+bool StartNewProcess::isExecuteAsRoot() {
+    return executeAsRoot->isChecked();
 }

@@ -1,12 +1,5 @@
 #pragma once
-#include <systemd/sd-bus.h>
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <cstring>
-#include <unistd.h>
 
-#include "../include/logger.hpp"
 
 struct ServiceInfo{
     std::string name;

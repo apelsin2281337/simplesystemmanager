@@ -1,10 +1,7 @@
 #pragma once
-#include <iostream>
-#include <chrono>
-#include <format>
-#include <fstream>
-#include <filesystem>
+#include <string>
 #include <mutex>
+
 
 #define Slog(a, b) Logger::getInstance().log(a, b);
 #define logL(b) Logger::getInstance().log(Status::Log, b);

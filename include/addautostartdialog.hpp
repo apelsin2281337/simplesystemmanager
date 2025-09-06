@@ -1,11 +1,9 @@
 #pragma once
 #include <QDialog>
-#include <QLineEdit>
-#include <QFormLayout>
-#include <QDialogButtonBox>
 
-
-#include "../include/logger.hpp"
+class QDialog;
+class QLineEdit;
+class QString;
 
 class AddAutostartDialog : public QDialog{
     Q_OBJECT
@@ -16,7 +14,7 @@ private:
 public:
     AddAutostartDialog(QWidget *parent = nullptr);
 
-    QString getName() const { return nameEdit->text(); }
-    QString getExec() const { return execEdit->text(); }
-    QString getComment() const { return commentEdit->text(); }
+    QString getName() const;
+    QString getExec() const;
+    QString getComment() const;
 };

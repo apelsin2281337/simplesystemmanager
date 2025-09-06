@@ -1,48 +1,22 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
 #include <QMainWindow>
-#include <QStandardItemModel>
-#include <QHeaderView>
-#include <QTimer>
-#include <QDebug>
-#include <QAbstractItemView>
-#include <QSortFilterProxyModel>
-#include <QtCharts/QChartView>
-#include <QtCharts/QSplineSeries>
-#include <QtCharts/QValueAxis>
-#include <QTranslator>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QFont>
-#include <QDialog>
-#include <QFile>
-#include <QTextStream>
-#include <QtGlobal>
-#include <QIcon>
-#include <QRandomGenerator>
-#include <QProcess>
-
-
 #include <memory>
-
-
-#include "../include/services.hpp"
-#include "../include/temp_files.hpp"
-#include "../include/autostart.hpp"
-#include "../include/addautostartdialog.hpp"
-#include "../include/mainwindow.h"
-#include "ui_mainwindow.h"
-#include "../include/logger.hpp"
 #include "../include/resource_monitor.hpp"
-#include "../include/config_manager.hpp"
-#include "../include/task_manager.hpp"
-#include "../include/start_new_process_dialog.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+class QStandardItemModel;
+class QMainWindow;
+class QSortFilterProxyModel;
+class QChart;
+class QSplineSeries;
+class QValueAxis;
+class QChartView;
+
+class Config;
 
 class MainWindow : public QMainWindow
 {
@@ -104,14 +78,12 @@ private:
     void loadTheme(const QString& themeName);
     void updateChart(double usage);
     Resmon::CPUStats prevCpuStats;
+    Resmon::NetworkStats lastNetworkStats{};
     std::unique_ptr<QTimer> resourceTimer;
     std::unique_ptr<QTimer> chartUpdateTimer;
     std::unique_ptr<QDialog> newEntryDialog;
-    std::unique_ptr<QTranslator> translator;
-    std::unique_ptr<QTranslator> m_translator;
     std::unique_ptr<QTimer> networkTimer;
-    Resmon::NetworkStats lastNetworkStats;
-    Config config;
+    std::unique_ptr<Config> config;
 };
 
 

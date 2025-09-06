@@ -3,7 +3,6 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <mutex>
 #include <unordered_map>
 #include <filesystem>
 #include <algorithm>
@@ -65,9 +64,8 @@ public:
                     process.memory_vsize_kb = 0;
                 }
             }
-
-            // CPU usage calculation is more complex and requires sampling over time
-            process.cpu_usage = 0.0; // Placeholder - needs proper implementation
+            //плейсхолдер потому что хз как
+            process.cpu_usage = 0.0;
         }
 
         return process;

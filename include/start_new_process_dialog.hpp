@@ -1,13 +1,8 @@
 #pragma once
-#include <iostream>
 #include <QDialog>
-#include <QLineEdit>
-#include <QCheckBox>
-#include <QFormLayout>
-#include <QDialogButtonBox>
 
-#include "../include/logger.hpp"
-
+class QLineEdit;
+class QCheckBox;
 
 class StartNewProcess : public QDialog{
     Q_OBJECT
@@ -19,12 +14,6 @@ private:
 public:
     StartNewProcess(QWidget* parent = nullptr);
 
-    QString getCommand() const {
-        return command->text();
-    }
-
-    bool isExecuteAsRoot() {
-        return executeAsRoot->isChecked();
-    }
-
+    QString getCommand() const;
+    bool isExecuteAsRoot();
 };
