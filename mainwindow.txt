@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>804</width>
     <height>600</height>
    </rect>
   </property>
@@ -34,7 +34,7 @@
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -46,11 +46,17 @@
       </item>
       <item>
        <widget class="QLabel" name="catGeneratorLabel">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>64</height>
+         </size>
+        </property>
         <property name="text">
          <string>Cat Generator</string>
         </property>
         <property name="textInteractionFlags">
-         <set>Qt::NoTextInteraction</set>
+         <set>Qt::TextInteractionFlag::NoTextInteraction</set>
         </property>
        </widget>
       </item>
@@ -117,7 +123,7 @@
                 </font>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -165,7 +171,7 @@
                   <string/>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -199,7 +205,7 @@
                   </font>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -243,7 +249,7 @@
                   <string/>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -268,7 +274,7 @@
                   <string>Download: 0 KB/s</string>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -278,7 +284,7 @@
                   <string>Upload: 0 KB/s</string>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -293,30 +299,28 @@
       </widget>
       <widget class="QWidget" name="tabTaskManager">
        <attribute name="title">
-        <string>TaskManager?</string>
+        <string>что нибудь</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_12">
           <item>
-           <widget class="QLineEdit" name="searchTaskLineEdit"/>
-          </item>
-          <item>
-           <widget class="QTableView" name="taskManagerTable">
-            <attribute name="verticalHeaderVisible">
-             <bool>false</bool>
-            </attribute>
+           <widget class="QLabel" name="label">
+            <property name="font">
+             <font>
+              <pointsize>60</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>ну чета лень</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
            </widget>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QPushButton" name="updateTasksButton">
-              <property name="text">
-               <string>Update Processes</string>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QPushButton" name="startProcessButton">
               <property name="text">

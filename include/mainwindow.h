@@ -45,6 +45,7 @@ private slots:
     void on_clearSelectedFilesButton_clicked();
     void on_startProcessButton_clicked();
     void on_stopProcessButton_clicked();
+    void on_updateTasksButton_clicked();
     void on_catButton_clicked();
     void onThemeChanged(int index);
 
@@ -81,6 +82,7 @@ private:
     Resmon::NetworkStats lastNetworkStats{};
     std::unique_ptr<QTimer> resourceTimer;
     std::unique_ptr<QTimer> chartUpdateTimer;
+    std::unique_ptr<QTimer> processUpdateTimer;
     std::unique_ptr<QDialog> newEntryDialog;
     std::unique_ptr<QTimer> networkTimer;
     std::unique_ptr<Config> config;
