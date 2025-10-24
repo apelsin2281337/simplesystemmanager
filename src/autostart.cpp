@@ -14,10 +14,10 @@
 std::filesystem::path autostart_dir_= "/etc/xdg/autostart";
 
 
-bool AutostartManager::addAutostartEntry(const std::string& name, const std::string& exec, const std::string& comment, bool isEnabled){
+bool AutostartManager::addAutostartEntry(const std::string& filename, const std::string& name, const std::string& exec, const std::string& comment, bool isEnabled){
 
 
-    std::filesystem::path dotdesktopFilePath = autostart_dir_ / (name + ".desktop");
+    std::filesystem::path dotdesktopFilePath = autostart_dir_ / (filename + ".desktop");
     std::ofstream file(dotdesktopFilePath);
     if (!file.is_open()){
         logE(std::format("Autostart: File {0} did not open successfully. it probably does not exist", dotdesktopFilePath.string()));
@@ -37,8 +37,8 @@ bool AutostartManager::addAutostartEntry(const std::string& name, const std::str
     return true;
 }
 
-bool AutostartManager::removeAutostartEntry(const std::string& name){
-    std::filesystem::path desktop_file = autostart_dir_ / (name + ".desktop");
+bool AutostartManager::removeAutostartEntry(const std::string& filename){
+    std::filesystem::path desktop_file = autostart_dir_ / (filename + ".desktop");
     if (!std::filesystem::exists(desktop_file)) {
         logE(std::format("Autostart: File {0} did not open successfully. it probably does not exist", desktop_file.string()));
         return false;
@@ -56,8 +56,8 @@ bool AutostartManager::removeAutostartEntry(const std::string& name){
     return true;
 }
 
-bool AutostartManager::setAutostartEntryEnabledStatus(const std::string& name, bool status){
-    std::filesystem::path desktop_file = autostart_dir_ / (name + ".desktop");
+bool AutostartManager::setAutostartEntryEnabledStatus(const std::string& filename, bool status){
+    std::filesystem::path desktop_file = autostart_dir_ / (filename + ".desktop");
     if (!std::filesystem::exists(desktop_file)) {
         logE(std::format("Autostart: File {0} did not open successfully. it probably does not exist", desktop_file.string()));
         return false;
@@ -106,6 +106,7 @@ std::vector<std::string> AutostartManager::listAutostartEntries(){
         if (entry.path().extension() == ".desktop") {
             std::string entryPath = entry.path().stem().string();
             entries.push_back(entryPath);
+            logF(entryPath);
             i++;
         }
     }
@@ -113,9 +114,9 @@ std::vector<std::string> AutostartManager::listAutostartEntries(){
     return entries;
 }
 
-std::unordered_map<std::string, std::string> AutostartManager::getAutostartEntryInfo(const std::string& name) {
+std::unordered_map<std::string, std::string> AutostartManager::getAutostartEntryInfo(const std::string& filename) {
     std::unordered_map<std::string, std::string> entryInfo;
-    std::filesystem::path dotDesktopFile = autostart_dir_ / (name + ".desktop");
+    std::filesystem::path dotDesktopFile = autostart_dir_ / (filename + ".desktop");
 
     if (!std::filesystem::exists(dotDesktopFile)) {
         logE(std::format("Autostart: {0} does not exist", dotDesktopFile.string()));
@@ -140,6 +141,7 @@ std::unordered_map<std::string, std::string> AutostartManager::getAutostartEntry
     std::string line;
     while (std::getline(file, line)) {
         std::smatch matches;
+        entryInfo["Filename"] = filename;
         if (std::regex_search(line, matches, namePattern)) {
             entryInfo["Name"] = matches[1].str();
         }

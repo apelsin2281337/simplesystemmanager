@@ -79,12 +79,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     autostartModel = std::make_unique<QStandardItemModel>(this);
     autostartModel->setColumnCount(3);
-    autostartModel->setHorizontalHeaderLabels({tr("Name"), tr("Executable"), tr("Status"), tr("Comment")});
+    autostartModel->setHorizontalHeaderLabels({"Filename", tr("Name"), tr("Executable"), tr("Status"), tr("Comment")});
     ui->autostartTable->setModel(autostartModel.get());
     ui->autostartTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->autostartTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     ui->autostartTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
-    ui->autostartTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
+    ui->autostartTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch); 
+    ui->autostartTable->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Stretch);
     ui->autostartTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     prevCpuStats = Resmon::get_cpu_usage();
 
@@ -190,7 +191,7 @@ void MainWindow::populateServicesTable()
             }
         }
     }
-    logL(std::format("MainWindow: Added {} services to table", services.size()));
+    //logL(std::format("MainWindow: Added {} services to table", services.size()));
 }
 
 void MainWindow::populateTaskManager()
@@ -266,12 +267,13 @@ void MainWindow::populateAutostartTable()
     for (auto& entry : entries) {
         QList<QStandardItem*> rowItems;
         auto info = AutostartManager::getAutostartEntryInfo(entry);
+        QStandardItem *filenameItem = new QStandardItem(QString::fromStdString(info["Filename"]));
         QStandardItem *nameItem = new QStandardItem(QString::fromStdString(info["Name"]));
         QStandardItem *execItem = new QStandardItem(QString::fromStdString(info["Exec"]));
         QStandardItem *statusItem = new QStandardItem(QString::fromStdString(info["Status"]));
         QStandardItem *commentItem = new QStandardItem(QString::fromStdString(info["Comment"]));
 
-        rowItems << nameItem << execItem << statusItem << commentItem;
+        rowItems << filenameItem << nameItem << execItem << statusItem << commentItem;
         autostartModel->appendRow(rowItems);
     }
     logL(std::format("MainWindow: Added {} autostart entries to table", entries.size()));
@@ -287,7 +289,6 @@ void MainWindow::on_scanTempFilesButton_clicked()
         std::vector<std::filesystem::path> tempfiles_paths = {
             "/tmp",
             "/var/tmp",
-            home / ".cache",
             home / ".local/share/Trash"
         };
 
@@ -507,7 +508,7 @@ void MainWindow::on_deleteSelectedFilesButton_clicked()
     int deletedCount = 0;
     int failedCount = 0;
 
-    for (const QModelIndex &index : selected) {
+    for (const QModelIndex& index : selected) {
         QString filePath = tempFilesModel->item(index.row())->text();
         try {
             if (std::filesystem::remove(filePath.toStdString())) {
@@ -552,18 +553,23 @@ void MainWindow::on_addEntryButton_clicked()
     logL("MainWindow: Showing add autostart entry dialog");
     AddAutostartDialog dialog(this);
     dialog.exec();
+    QString filename = dialog.getFilename();
     QString name = dialog.getName();
     QString exec = dialog.getExec();
     QString comment = dialog.getComment();
+    if (filename.isEmpty()){
+        filename = name;
+    }
 
     if (name.isEmpty() || exec.isEmpty()) {
-        logE("MainWindow: MainWindow: Empty name or executable when adding autostart entry");
+        logE("MainWindow: Empty name or executable when adding autostart entry");
         showError(tr("Name and Executable fields are required"));
         return;
     }
 
     logL(std::format("MainWindow: Adding autostart entry: {}", name.toStdString()));
     bool success = AutostartManager::addAutostartEntry(
+        filename.toStdString(),
         name.toStdString(),
         exec.toStdString(),
         comment.toStdString());
@@ -582,30 +588,29 @@ void MainWindow::on_removeEntryButton_clicked()
 {
     QModelIndexList selected = ui->autostartTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        logE("MainWindow: MainWindow: No autostart entry selected for removal");
+        logE("MainWindow: No autostart entry selected for removal");
         showError(tr("Please select an entry first!"));
         return;
     }
 
-    QString name = autostartModel->item(selected.first().row(), 0)->text();
+    QString filename = autostartModel->item(selected.first().row(), 0)->text();
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, tr("Confirm Removal"),
-                                  tr("Are you sure you want to remove '%1'?").arg(name),
+                                  tr("Are you sure you want to remove '%1'?").arg(filename),
                                   QMessageBox::Yes|QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
-        logL(std::format("MainWindow: Removing autostart entry: {}", name.toStdString()));
-        bool success = AutostartManager::removeAutostartEntry(name.toStdString());
+        logL(std::format("MainWindow: Removing autostart entry: {}", filename.toStdString()));
+        bool success = AutostartManager::removeAutostartEntry(filename.toStdString());
         if (success) {
-            logL(std::format("MainWindow: Successfully removed autostart entry: {}", name.toStdString()));
-            showInfo(tr("Entry %1 removed successfully").arg(name));
-            populateAutostartTable();
+            logL(std::format("MainWindow: Successfully removed autostart entry: {}", filename.toStdString()));
+            showInfo(tr("Entry %1 removed successfully").arg(filename));
         } else {
-            logE(std::format("MainWindow: Failed to remove autostart entry: {}", name.toStdString()));
-            showError(tr("Failed to remove autostart entry %1").arg(name));
+            logE(std::format("MainWindow: Failed to remove autostart entry: {}", filename.toStdString()));
+            showError(tr("Failed to remove autostart entry %1").arg(filename));
         }
     } else {
-        logL("MainWindow: MainWindow: Autostart entry removal cancelled by user");
+        logL("MainWindow:Autostart entry removal cancelled by user");
     }
 }
 
@@ -613,7 +618,7 @@ void MainWindow::on_enableEntryButton_clicked()
 {
     QModelIndexList selected = ui->autostartTable->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
-        logE("MainWindow: MainWindow: No autostart entry selected for enable/disable");
+        logE("MainWindow: No autostart entry selected for enable/disable");
         showError(tr("Please select an entry first!"));
         return;
     }
@@ -652,32 +657,26 @@ void MainWindow::on_startProcessButton_clicked() {
         return;
     }
 
-    QProcess process;
+    QProcess* process = new QProcess(this);
     QStringList arguments;
 
     if (isRoot) {
         arguments << "-E" << command;
-        process.start("sudo", arguments);
+        process->start("sudo", arguments);
     } else {
-        arguments << "-u" << "#1000" << "sh" << "-c" << command;
-        process.start("sudo", arguments);
+        arguments << "-E" << "-u" << "#1000" << "sh" << "-c" << command;
+        process->start("sudo", arguments);
+        qDebug() << "My QStringList:" << arguments;
     }
 
-    if (!process.waitForStarted()) {
+
+    if (process->waitForStarted()) {
+        showInfo("Process started successfully!");
+    } else {
         showError("Error. Failed to start process!");
-        return;
+        process->deleteLater();
     }
 
-    //process.waitForFinished();
-
-    if (process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0) {
-        showInfo("Process executed successfully!");
-    } else {
-        QMessageBox::critical(this, "Error",
-                              QString("Process failed with exit code: %1\nError: %2")
-                                  .arg(process.exitCode())
-                                  .arg(QString(process.readAllStandardError())));
-    }
 }
 
 void MainWindow::on_stopProcessButton_clicked() {

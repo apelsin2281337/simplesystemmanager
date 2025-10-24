@@ -261,7 +261,7 @@ std::vector<ServiceInfo> get_services() {
     sd_bus_message_unref(reply);
     sd_bus_unref(bus);
 
-    logL(std::format("Services: Services: Found {0} services", services.size()));
+    //logL(std::format("Services: Services: Found {0} services", services.size()));
     return services;
 }
 

@@ -9,7 +9,6 @@
 
 
 
-//#include "mainwindow.h"
 #include "../include/logger.hpp"
 #include "../include/temp_files.hpp"
 
