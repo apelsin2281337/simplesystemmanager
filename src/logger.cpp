@@ -13,7 +13,11 @@ Logger::Logger() {
     std::string timeString = std::format("{:%d-%m-%Y}", now_local);
     fileName_ = std::format("/var/log/systemmanager/Log_{}.txt", timeString);
 
-    std::filesystem::create_directory("/var/log/systemmanager/");
+    std::error_code ec;
+    std::filesystem::create_directories("/var/log/systemmanager/", ec);
+    if (ec && ec != std::errc::file_exists) {
+        std::cerr << "Failed to create log directory: " << ec.message() << std::endl;
+    }
 }
 
 void Logger::log(Status status, const std::string& message) {

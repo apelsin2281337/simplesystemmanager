@@ -153,7 +153,7 @@ void MainWindow::populateServicesTable()
     QFont font;
     QSet<QString> selectedServices;
     for (const QModelIndex& index : selectedIndexes) {
-        QModelIndex sourceIndex = taskManagerProxyModel->mapToSource(index);
+        QModelIndex sourceIndex = servicesProxyModel->mapToSource(index);
         if (sourceIndex.isValid()) {
             selectedServices.insert(servicesModel->item(sourceIndex.row(), 0)->text());
         }
@@ -507,6 +507,16 @@ void MainWindow::on_deleteSelectedFilesButton_clicked()
     logL(std::format("MainWindow: Attempting to delete {} files", selected.size()));
     int deletedCount = 0;
     int failedCount = 0;
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this,
+        tr("Confirm Deletion"),
+        tr("Are you sure you want to delete %1 selected file(s)?").arg(selected.size()),
+        QMessageBox::Yes | QMessageBox::No
+    );
+
+    if (reply != QMessageBox::Yes) {
+        return;
+    }
 
     for (const QModelIndex& index : selected) {
         QString filePath = tempFilesModel->item(index.row())->text();
@@ -742,38 +752,6 @@ void MainWindow::on_updateTasksButton_clicked(){
     showInfo("Task Manager was updated!");
 }
 
-void MainWindow::createCpuLoadChart()
-{
-    logL("MainWindow: Creating CPU load chart");
-    chart = new QChart();
-    series = new QSplineSeries();
-    chart->addSeries(series);
-    chart->setTitle(tr("CPU Load Graph"));
-    chart->setMinimumHeight(200);
-    chart->setMaximumHeight(300);
-    //chart->setTitleBrush();
-    axisX = new QValueAxis();
-    axisY = new QValueAxis();
-    axisY->setRange(0, 100);
-    axisX->setGridLineVisible(false);
-
-    axisY->setLabelFormat(QString("%d%%"));
-    axisX->setLabelsVisible(false);
-    chart->addAxis(axisX, Qt::AlignBottom);
-    chart->addAxis(axisY, Qt::AlignRight);
-
-    series->attachAxis(axisX);
-    series->attachAxis(axisY);
-    series->setColor(QColor(76, 175, 80));
-    chart->setBackgroundBrush(Qt::NoBrush);
-    chart->setBackgroundVisible(false);
-    chart->legend()->hide();
-
-    chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    ui->verticalLayout_10->addWidget(chartView);
-}
-
 void MainWindow::updateChart(double usage)
 {
     static int x = 0;
@@ -837,6 +815,38 @@ void MainWindow::updateDiskUsage()
                                     .arg(disk.total / (1024 * 1024)));
 }
 
+
+void MainWindow::createCpuLoadChart()
+{
+    logL("MainWindow: Creating CPU load chart");
+    chart = new QChart();
+    series = new QSplineSeries();
+    chart->addSeries(series);
+    chart->setTitle(tr("CPU Load Graph"));
+    chart->setMinimumHeight(200);
+    chart->setMaximumHeight(300);
+    //chart->setTitleBrush();
+    axisX = new QValueAxis();
+    axisY = new QValueAxis();
+    axisY->setRange(0, 100);
+    axisX->setGridLineVisible(false);
+
+    axisY->setLabelFormat(QString("%d%%"));
+    axisX->setLabelsVisible(false);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    chart->addAxis(axisY, Qt::AlignRight);
+
+    series->attachAxis(axisX);
+    series->attachAxis(axisY);
+    series->setColor(QColor(76, 175, 80));
+    chart->setBackgroundBrush(Qt::NoBrush);
+    chart->setBackgroundVisible(false);
+    chart->legend()->hide();
+
+    chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    ui->verticalLayout_10->addWidget(chartView);
+}
 
 
 void MainWindow::updateInternetUsage(){

@@ -308,6 +308,6 @@ bool is_service_enabled(const std::string& unit_name) {
     sd_bus_error_free(&error);
     sd_bus_message_unref(reply);
     sd_bus_unref(bus);
-    logL(std::format("Service {0} is enabled", unit_name));
+    logL(std::format("Service {} is {}", unit_name, is_active ? "enabled" : "not enabled"));
     return is_active;
 }

@@ -24,10 +24,7 @@ std::expected<std::vector<std::filesystem::path>, std::string> get_recursive_fol
         logE(std::format("Path is not a directory: {}", folder_path.string()));
         return std::unexpected("Path is not a directory");
     }
-    if (std::filesystem::is_empty(folder_path)) {
-        logL(std::format("Temp files: Folder is empty: {}", folder_path.string()));
-        return std::unexpected("Folder is empty");
-    }
+
 
     try {
         for (const auto& entry : std::filesystem::recursive_directory_iterator(folder_path)) {

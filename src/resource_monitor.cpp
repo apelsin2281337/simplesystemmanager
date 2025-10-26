@@ -88,6 +88,7 @@ std::vector<std::string> Resmon::get_mem_stats() {
 }
 
 Resmon::DiskStats Resmon::get_disk_usage() {
+    std::lock_guard<std::mutex> lock(statsMutex_);
     DiskStats result = {0, 0, 0};
     struct statvfs vfs;
 
@@ -138,6 +139,7 @@ Resmon::MemStats Resmon::get_mem_usage() {
 
 
 std::string Resmon::get_network_interface() {
+    std::lock_guard<std::mutex> lock(statsMutex_);
     std::ifstream file("/proc/net/dev");
     if (!file.is_open()) {
         logE("Failed to open /proc/net/dev");

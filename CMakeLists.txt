@@ -31,9 +31,10 @@ find_package(Qt6 REQUIRED COMPONENTS
     Gui
     Widgets
     Charts
-    WaylandClient
     Multimedia
 )
+
+find_package(Qt6 COMPONENTS WaylandClient)
 
 set(CMAKE_CXX_STANDARD 23)
 if(TARGET Qt6::WaylandClient)
@@ -108,24 +109,9 @@ endif()
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 
 
-install(FILES packaging/SystemManager.ico
-        DESTINATION share/icons/hicolor/256x256/apps
-        RENAME SystemManager.png
-)
 
-install(FILES packaging/SystemManager.ico
-        DESTINATION share/icons/hicolor/48x48/apps
-        RENAME SystemManager.png
-)
 
-install(FILES packaging/SystemManager.ico
-        DESTINATION share/icons/hicolor/32x32/apps
-        RENAME SystemManager.png
-)
 
-install(FILES packaging/SystemManager.desktop
-        DESTINATION share/applications
-)
 
 install(FILES ${QM_FILES}
         DESTINATION share/${PROJECT_NAME}/translations
@@ -134,13 +120,7 @@ install(FILES ${QM_FILES}
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 
 
-install(PROGRAMS packaging/start-manager.sh
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    RENAME systemmanager-start
-    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                GROUP_READ GROUP_EXECUTE
-                WORLD_READ WORLD_EXECUTE
-)
+
 
 
 configure_file(

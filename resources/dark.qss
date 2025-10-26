@@ -54,5 +54,5 @@ QTabBar::tab:selected {
 
 
 QChart::title {
-    color: #fff
+    color: #fff;
 }

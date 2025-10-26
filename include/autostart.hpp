@@ -7,7 +7,7 @@
 #include <regex>
 
 
-#include "../include/logger.hpp"
+#include "logger.hpp"
 
 class AutostartManager{
 public:

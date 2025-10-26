@@ -3,10 +3,10 @@
 #include <mutex>
 
 
-#define Slog(a, b) Logger::getInstance().log(a, b);
-#define logL(b) Logger::getInstance().log(Status::Log, b);
-#define logE(b) Logger::getInstance().log(Status::Error, b);
-#define logF(b) Logger::getInstance().log(Status::Fatal, b);
+#define Slog(a, b) Logger::getInstance().log(a, b)
+#define logL(b) Logger::getInstance().log(Status::Log, b)
+#define logE(b) Logger::getInstance().log(Status::Error, b)
+#define logF(b) Logger::getInstance().log(Status::Fatal, b)
 
 enum class Status{
     Log, Error, Fatal
