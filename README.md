@@ -2,12 +2,19 @@
 
 A system management tool with a Qt GUI interface.
 
+> [!IMPORTANT]
+> .
+
 ## Requirements
 - Qt 6.9 (nice)
 - Systemd development packages
 - Root privileges
 - C++23 compatible compiler
 - Will to live (optional, like as if I have it, and I created this thing)
+
+
+> [!IMPORTANT]
+> Building guide and dependencies may be wrong or outdated. I just dont have enough time nor do i have a motivation to maintain a readme. Surely nobody's doing this without my guidance anyway. Thanks!
 
 ## Building
 ```bash
