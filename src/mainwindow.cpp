@@ -1,36 +1,5 @@
-#include <QStandardItemModel>
-#include <QHeaderView>
-#include <QTimer>
-#include <QDebug>
-#include <QAbstractItemView>
-#include <QSortFilterProxyModel>
-#include <QtCharts/QChartView>
-#include <QtCharts/QSplineSeries>
-#include <QtCharts/QValueAxis>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QFont>
-#include <QDialog>
-#include <QFile>
-#include <QTextStream>
-#include <QtGlobal>
-#include <QIcon>
-#include <QRandomGenerator>
-#include <QProcess>
-#include <thread>
-#include <QDebug>
+#include "../include/mainincludes.hpp"
 
-
-#include "../include/services.hpp"
-#include "../include/temp_files.hpp"
-#include "../include/autostart.hpp"
-#include "../include/addautostartdialog.hpp"
-#include "../include/mainwindow.h"
-#include "ui_mainwindow.h"
-#include "../include/logger.hpp"
-#include "../include/config_manager.hpp"
-#include "../include/start_new_process_dialog.hpp"
-#include "../include/task_manager.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -44,103 +13,21 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     cfg = std::make_unique<Config>("config.json");
     cfg->load();
+
     ui->retranslateUi(this);
-    ui->languageComboBox->addItem("Русский", "ru_RU");
-    ui->languageComboBox->addItem("English", "en_US");
-    ui->themeComboBox->addItem(tr("Dark Theme"), "dark");
-    ui->themeComboBox->addItem(tr("Light Theme"), "light");
-    connect(ui->themeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &MainWindow::onThemeChanged);
-    ui->themeComboBox->setCurrentIndex(0);
-
-    connect(ui->languageComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &MainWindow::onLanguageChanged);
-    ui->languageComboBox->setCurrentIndex(0);
-
-    servicesModel = std::make_unique<QStandardItemModel>(this);
-    servicesModel->setColumnCount(3);
-    servicesModel->setHorizontalHeaderLabels({tr("Service"), tr("Description"), tr("Status")});
-
-    servicesProxyModel = std::make_unique<QSortFilterProxyModel>(this);
-    servicesProxyModel->setSourceModel(servicesModel.get());
-    servicesProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-
-    ui->servicesTable->setModel(servicesProxyModel.get());
-    //ui->servicesTable->setColumnWidth(0, 300);
-    //ui->servicesTable->setColumnWidth(1, 338);
-    //ui->servicesTable->setColumnWidth(2, 68);
-
-    ui->servicesTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-    ui->servicesTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    ui->servicesTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Fixed);
-    ui->servicesTable->setColumnWidth(2, 100);
-    ui->servicesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    connect(ui->searchServicesLineEdit, &QLineEdit::textChanged,
-            this, &MainWindow::on_searchServicesTextChanged);
-
-    tempFilesModel = std::make_unique<QStandardItemModel>(this);
-    tempFilesModel->setColumnCount(1);
-    tempFilesModel->setHorizontalHeaderLabels({tr("File Path")});
-    ui->tempFilesTable->setModel(tempFilesModel.get());
-    ui->tempFilesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->tempFilesTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
-
-    autostartModel = std::make_unique<QStandardItemModel>(this);
-    autostartModel->setColumnCount(3);
-    autostartModel->setHorizontalHeaderLabels({tr("Filename"), tr("Name"), tr("Executable"), tr("Status"), tr("Comment")});
-    ui->autostartTable->setModel(autostartModel.get());
-    ui->autostartTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-    ui->autostartTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    ui->autostartTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
-    ui->autostartTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch); 
-    ui->autostartTable->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Stretch);
-    ui->autostartTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    prevCpuStats = Resmon::get_cpu_usage();
-
-    taskManagerModel = std::make_unique<QStandardItemModel>(0, 6, this);
-    taskManagerModel->setHorizontalHeaderLabels({tr("PID"), tr("Name"), tr("CPU Load"), tr("Memory Load"), tr("Physical RAM"), tr("Virtual RAM")});
-
-    taskManagerProxyModel = std::make_unique<QSortFilterProxyModel>(this);
-    taskManagerProxyModel->setSourceModel(taskManagerModel.get());
-    taskManagerProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    taskManagerProxyModel->setFilterKeyColumn(-1);
-    taskManagerProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    taskManagerProxyModel->setDynamicSortFilter(true);
-    ui->taskManagerTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    ui->taskManagerTable->setModel(taskManagerProxyModel.get());
-
-    resourceTimer = std::make_unique<QTimer>(this);
-    connect(resourceTimer.get(), &QTimer::timeout, this, [this]() {
-        updateCpuUsage();
-        updateSwapUsage();
-        updateRamUsage();
-        updateDiskUsage();
-        updateInternetUsage();
-        populateTaskManager();
-        populateServicesTable();
-    });
+    setupComboBoxes();
+    setupModels();
+    setupTables();
+    setupTimers();
+    setupControllers();
     //не менять сломается инет
     resourceTimer->start(1000);
-
-    createCpuLoadChart();
-    loadTheme(QString::fromStdString(cfg->getTheme()));
-    loadLanguage(QString::fromStdString(cfg->getLanguage()));
-    chartUpdateTimer = std::make_unique<QTimer>(this);
-    connect(chartUpdateTimer.get(), &QTimer::timeout, this, [this]() {
-        Resmon::CPUStats current = Resmon::get_cpu_usage();
-        double usage = current.usage_percent(prevCpuStats);
-        prevCpuStats = current;
-        updateChart(usage);
-    });
     chartUpdateTimer->start(700);
 
     processUpdateTimer = std::make_unique<QTimer>(this);
     //connect(processUpdateTimer.get(), &QTimer::timeout, this, &MainWindow::populateTaskManager);
     //processUpdateTimer->start(2000);
 
-    populateServicesTable();
-    populateAutostartTable();
     ui->cpuGroupBox->setTitle(tr("CPU Usage (%1)").arg(QString::fromStdString(Resmon::get_cpu_name())));
     ui->networkGroupBox->setTitle(tr("Network Usage (%1)").arg(QString::fromStdString(Resmon::get_network_interface())));
     logL("MainWindow: MainWindow initialization completed");
@@ -153,343 +40,165 @@ MainWindow::~MainWindow() {
     logL("MainWindow: Cleanup completed\n");
 }
 
-void MainWindow::populateServicesTable()
-{
-    logL("MainWindow: Populating services table");
-    QModelIndexList selectedIndexes = ui->servicesTable->selectionModel()->selectedRows();
-    servicesModel->removeRows(0, servicesModel->rowCount());
-    auto services = get_services();
-    QFont font;
-    QSet<QString> selectedServices;
-    for (const QModelIndex& index : selectedIndexes) {
-        QModelIndex sourceIndex = servicesProxyModel->mapToSource(index);
-        if (sourceIndex.isValid()) {
-            selectedServices.insert(servicesModel->item(sourceIndex.row(), 0)->text());
-        }
-    }
+void MainWindow::setupComboBoxes(){
+    ui->languageComboBox->addItem("Русский", "ru_RU");
+    ui->languageComboBox->addItem("English", "en_US");
+    ui->themeComboBox->addItem(tr("Dark Theme"), "dark");
+    ui->themeComboBox->addItem(tr("Light Theme"), "light");
+    connect(ui->themeComboBox, &QComboBox::currentIndexChanged,
+            this, &MainWindow::onThemeChanged);
+    ui->themeComboBox->setCurrentIndex(0);
 
-    for (const auto& service : services) {
-        QList<QStandardItem*> rowItems;
-
-        QStandardItem *nameItem = new QStandardItem(QString::fromStdString(service.name));
-        QStandardItem *descItem = new QStandardItem(QString::fromStdString(service.description));
-        QStandardItem *statusItem = new QStandardItem(QString::fromStdString(service.status));
-
-        if (service.status == "active"){
-            statusItem->setForeground(QBrush(Qt::green));
-        } else if (service.status == "failed"){
-            statusItem->setForeground(QBrush(Qt::red));
-        }
-
-        rowItems << nameItem << descItem << statusItem;
-        servicesModel->appendRow(rowItems);
-
-        for (auto& item : rowItems){
-            item->setFont(font);
-            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-        }
-    }
-
-    if (!selectedServices.isEmpty()) {
-        for (int row = 0; row < servicesModel->rowCount(); ++row) {
-            QString service = servicesModel->item(row, 0)->text();
-            if (selectedServices.contains(service)) {
-                QModelIndex proxyIndex = servicesProxyModel->mapFromSource(servicesModel->index(row, 0));
-                ui->servicesTable->selectionModel()->select(proxyIndex,
-                                                               QItemSelectionModel::Select | QItemSelectionModel::Rows);
-            }
-        }
-    }
-    //logL(std::format("MainWindow: Added {} services to table", services.size()));
+    connect(ui->languageComboBox, &QComboBox::currentIndexChanged,
+            this, &MainWindow::onLanguageChanged);
+    ui->languageComboBox->setCurrentIndex(0);
 }
 
-void MainWindow::populateTaskManager()
-{
-    logL("MainWindow: Populating Task Manager");
+void MainWindow::setupControllers(){
+    SvcCtl = std::make_unique<ServicesController>(ui->servicesTable, servicesModel.get(), servicesProxyModel.get());
+    connect(ui->startServiceButton,  &QPushButton::clicked, SvcCtl.get(),      &ServicesController::on_startServiceButton_clicked);\
+    connect(ui->stopServiceButton,   &QPushButton::clicked, SvcCtl.get(),      &ServicesController::on_stopServiceButton_clicked);
+    connect(ui->enableServiceButton, &QPushButton::clicked, SvcCtl.get(),      &ServicesController::on_enableServiceButton_clicked);
+    connect(ui->disableServiceButton,&QPushButton::clicked, SvcCtl.get(),      &ServicesController::on_disableServiceButton_clicked);
+    connect(ui->refreshServicesButton,&QPushButton::clicked, SvcCtl.get(),     &ServicesController::on_refreshServicesButton_clicked);
+    connect(ui->searchServicesLineEdit, &QLineEdit::textChanged, SvcCtl.get(), &ServicesController::on_searchServicesTextChanged);
+    connect(SvcCtl.get(), &ServicesController::info,  this, &MainWindow::showInfo);
+    connect(SvcCtl.get(), &ServicesController::error, this, &MainWindow::showError);
+    SvcCtl->populateServicesTable();
 
-    int sortColumn = ui->taskManagerTable->horizontalHeader()->sortIndicatorSection();
-    Qt::SortOrder sortOrder = ui->taskManagerTable->horizontalHeader()->sortIndicatorOrder();
+    TmCtl = std::make_unique<TaskManagerController>(ui->taskManagerTable, taskManagerModel.get(), taskManagerProxyModel.get(), this, this);
+    connect(ui->startProcessButton, &QPushButton::clicked, TmCtl.get(), &TaskManagerController::on_startProcessButton_clicked);
+    connect(ui->stopProcessButton, &QPushButton::clicked, TmCtl.get(), &TaskManagerController::on_stopProcessButton_clicked);
+    connect(ui->updateTasksButton, &QPushButton::clicked, TmCtl.get(), &TaskManagerController::on_updateTasksButton_clicked);
+    connect(ui->searchTaskLineEdit, &QLineEdit::textChanged, TmCtl.get(), &TaskManagerController::on_searchTaskLineEdit_textChanged);
+    TmCtl->populateTaskManager();
+    connect(TmCtl.get(), &TaskManagerController::info,  this, &MainWindow::showInfo);
+    connect(TmCtl.get(), &TaskManagerController::error, this, &MainWindow::showError);
 
-    QModelIndexList selectedIndexes = ui->taskManagerTable->selectionModel()->selectedRows();
-    QSet<QString> selectedPids;
-    for (const QModelIndex& index : selectedIndexes) {
-        QModelIndex sourceIndex = taskManagerProxyModel->mapToSource(index);
-        if (sourceIndex.isValid()) {
-            selectedPids.insert(taskManagerModel->item(sourceIndex.row(), 0)->text());
-        }
-    }
+    AutostartCtl = std::make_unique<AutostartController>(ui->autostartTable, autostartModel.get(), this, this);
+    connect(ui->addEntryButton, &QPushButton::clicked, AutostartCtl.get(), &AutostartController::on_addEntryButton_clicked);
+    connect(ui->removeEntryButton, &QPushButton::clicked, AutostartCtl.get(), &AutostartController::on_removeEntryButton_clicked);
+    connect(ui->enableEntryButton, &QPushButton::clicked, AutostartCtl.get(), &AutostartController::on_enableEntryButton_clicked);
+    connect(ui->updateEntriesButton, &QPushButton::clicked, AutostartCtl.get(), &AutostartController::on_updateEntriesButton_clicked);
+    AutostartCtl->populateAutostartTable();
+    connect(AutostartCtl.get(), &AutostartController::info,  this, &MainWindow::showInfo);
+    connect(AutostartCtl.get(), &AutostartController::error, this, &MainWindow::showError);
 
-    taskManagerModel->removeRows(0, taskManagerModel->rowCount());
-
-    auto tasks = TaskManager::getProcessesInfo();
-
-    for (const auto& task : tasks) {
-        QList<QStandardItem*> rowItems;
-        size_t nproc = std::thread::hardware_concurrency();
-        float cpuLoad = task.cpuLoad / nproc;
-        QStandardItem *pidItem = new QStandardItem(QString::number(task.pid));
-        QStandardItem *nameItem = new QStandardItem(QString::fromStdString(task.command));
-        QStandardItem *cpuloadItem = new QStandardItem(QString::number(cpuLoad, 'f', 1));
-        QStandardItem *memloadItem = new QStandardItem(QString::number(task.memLoad, 'f', 1));
-        QStandardItem *PRAMItem = new QStandardItem(QString::number(task.rss));
-        QStandardItem *VRAMItem = new QStandardItem(QString::number(task.vsz));
-
-        pidItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        nameItem->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-        cpuloadItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        memloadItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        PRAMItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        VRAMItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-
-        for (auto& item : {pidItem, nameItem, cpuloadItem, memloadItem, PRAMItem, VRAMItem}) {
-            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-        }
-
-        rowItems << pidItem << nameItem << cpuloadItem << memloadItem << PRAMItem << VRAMItem;
-        taskManagerModel->appendRow(rowItems);
-    }
-
-    if (sortColumn >= 0) {
-        ui->taskManagerTable->sortByColumn(sortColumn, sortOrder);
-    }
-
-    if (!selectedPids.isEmpty()) {
-        for (int row = 0; row < taskManagerModel->rowCount(); ++row) {
-            QString pid = taskManagerModel->item(row, 0)->text();
-            if (selectedPids.contains(pid)) {
-                QModelIndex proxyIndex = taskManagerProxyModel->mapFromSource(taskManagerModel->index(row, 0));
-                ui->taskManagerTable->selectionModel()->select(proxyIndex,
-                                                               QItemSelectionModel::Select | QItemSelectionModel::Rows);
-            }
-        }
-    }
-
-    logL(std::format("MainWindow: Updated {} tasks in table", tasks.size()));
+    TempfilesCtl = std::make_unique<TempfilesController>(ui->tempFilesTable, tempFilesModel.get(), this, this);
+    connect(ui->scanTempFilesButton, &QPushButton::clicked, TempfilesCtl.get(), &TempfilesController::on_scanTempFilesButton_clicked);
+    connect(ui->clearSelectedFilesButton, &QPushButton::clicked, TempfilesCtl.get(), &TempfilesController::on_clearSelectedFilesButton_clicked);
+    connect(ui->selectAllFilesButton, &QPushButton::clicked, TempfilesCtl.get(), &TempfilesController::on_selectAllFilesButton_clicked);
+    connect(ui->deleteSelectedFilesButton, &QPushButton::clicked, TempfilesCtl.get(), &TempfilesController::on_deleteSelectedFilesButton_clicked);
+    connect(TempfilesCtl.get(), &TempfilesController::info,  this, &MainWindow::showInfo);
+    connect(TempfilesCtl.get(), &TempfilesController::error, this, &MainWindow::showError);
 }
 
-void MainWindow::populateAutostartTable()
+
+void MainWindow::setupModels()
 {
-    logL("MainWindow: Populating autostart table");
-    autostartModel->removeRows(0, autostartModel->rowCount());
-    std::vector<std::string> entries = AutostartManager::listAutostartEntries();
+    servicesModel = std::make_unique<QStandardItemModel>(this);
+    servicesModel->setColumnCount(3);
+    servicesModel->setHorizontalHeaderLabels({
+        tr("Service"), tr("Description"), tr("Status")
+    });
 
-    for (auto& entry : entries) {
-        QList<QStandardItem*> rowItems;
-        auto info = AutostartManager::getAutostartEntryInfo(entry);
-        QStandardItem *filenameItem = new QStandardItem(QString::fromStdString(info["Filename"]));
-        QStandardItem *nameItem = new QStandardItem(QString::fromStdString(info["Name"]));
-        QStandardItem *execItem = new QStandardItem(QString::fromStdString(info["Exec"]));
-        QStandardItem *statusItem = new QStandardItem(QString::fromStdString(info["Status"]));
-        QStandardItem *commentItem = new QStandardItem(QString::fromStdString(info["Comment"]));
+    servicesProxyModel = std::make_unique<QSortFilterProxyModel>(this);
+    setupProxyModel(servicesProxyModel.get(), servicesModel.get());
+    ui->servicesTable->setModel(servicesProxyModel.get());
 
-        rowItems << filenameItem << nameItem << execItem << statusItem << commentItem;
-        autostartModel->appendRow(rowItems);
-    }
-    logL(std::format("MainWindow: Added {} autostart entries to table", entries.size()));
+    tempFilesModel = std::make_unique<QStandardItemModel>(this);
+    tempFilesModel->setColumnCount(1);
+    tempFilesModel->setHorizontalHeaderLabels({tr("File Path")});
+    ui->tempFilesTable->setModel(tempFilesModel.get());
+
+    autostartModel = std::make_unique<QStandardItemModel>(this);
+    autostartModel->setColumnCount(5);
+    autostartModel->setHorizontalHeaderLabels({
+        tr("Filename"), tr("Name"), tr("Executable"),
+        tr("Status"),   tr("Comment")
+    });
+    ui->autostartTable->setModel(autostartModel.get());
+
+    taskManagerModel = std::make_unique<QStandardItemModel>(0, 6, this);
+    taskManagerModel->setHorizontalHeaderLabels({
+        tr("PID"), tr("Name"), tr("CPU Load"),
+        tr("Memory Load"), tr("Physical RAM"), tr("Virtual RAM")
+    });
+
+    taskManagerProxyModel = std::make_unique<QSortFilterProxyModel>(this);
+    setupProxyModel(taskManagerProxyModel.get(), taskManagerModel.get());
+    ui->taskManagerTable->setModel(taskManagerProxyModel.get());
+    ui->taskManagerTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
-void MainWindow::on_scanTempFilesButton_clicked()
+
+void MainWindow::setupProxyModel(QSortFilterProxyModel *proxy,
+                                 QStandardItemModel   *source)
 {
-    logL("MainWindow: Scanning for temporary files");
-    tempFilesModel->removeRows(0, tempFilesModel->rowCount());
-
-    try {
-        std::filesystem::path home = get_home_directory();
-        std::vector<std::filesystem::path> tempfiles_paths = {
-            "/tmp",
-            "/var/tmp",
-            home / ".local/share/Trash"
-        };
-
-        for (auto& path : tempfiles_paths) {
-            logL(std::format("MainWindow: Scanning directory: {}", path.string()));
-            auto folder_contents = get_recursive_folder_content(path);
-
-            if (!folder_contents) {
-                logE(folder_contents.error());
-                showError(QString::fromStdString(folder_contents.error()));
-                continue;
-            }
-
-            for (const auto& file : *folder_contents) {
-                tempFilesModel->appendRow(new QStandardItem(QString::fromStdString(file.string())));
-            }
-        }
-
-        showInfo(tr("Found %1 temporary files").arg(tempFilesModel->rowCount()));
-        logL(std::format("MainWindow: Found {} temporary files", tempFilesModel->rowCount()));
-    }
-    catch (const std::exception& e) {
-        logE(std::format("MainWindow: Error scanning temp files: {}", e.what()));
-        showError(tr("Error: ") + e.what());
-    }
+    proxy->setSourceModel(source);
+    proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    proxy->setFilterKeyColumn(-1);
+    proxy->setSortCaseSensitivity(Qt::CaseInsensitive);
+    proxy->setDynamicSortFilter(true);
 }
 
-void MainWindow::on_startServiceButton_clicked()
-{
-    QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
-    if (selected.isEmpty()) {
-        logE("MainWindow: No service selected for start");
-        showError(tr("Please select a service first"));
-        return;
-    }
+void MainWindow::setupTables(){
 
-    QModelIndex sourceIndex = servicesProxyModel->mapToSource(selected.first());
-    QString serviceName = servicesModel->item(sourceIndex.row(), 0)->text();
-    QString serviceStatus = servicesModel->item(sourceIndex.row(), 2)->text();
-    int result = -1;
-    if (serviceName.isEmpty()) {
-        logE("MainWindow: Invalid service selected for start");
-        showError(tr("Invalid service selected"));
-        return;
-    }
 
-    if (serviceStatus.compare("active", Qt::CaseInsensitive) != 0) {
-        logL(std::format("MainWindow: Starting service: {}", serviceName.toStdString()));
-        result = start_service(serviceName.toStdString());
-    }
-    else {
-        showInfo(tr("MainWindow: Service %1 is already started").arg(serviceName));
-        return;
-    }
+    ui->servicesTable->setModel(servicesProxyModel.get());
+    //ui->servicesTable->setColumnWidth(0, 300);
+    //ui->servicesTable->setColumnWidth(1, 338);
+    //ui->servicesTable->setColumnWidth(2, 68);
 
-    if (result == 0) {
-        logL(std::format("MainWindow: Successfully started service: {}", serviceName.toStdString()));
-        showInfo(tr("Service started successfully"));
-        populateServicesTable();
-    } else {
-        logE(std::format("MainWindow: Failed to start service: {}", serviceName.toStdString()));
-        showError(tr("Failed to start service"));
-    }
+    ui->servicesTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui->servicesTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->servicesTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Fixed);
+    ui->servicesTable->setColumnWidth(2, 100);
+    ui->servicesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+
+    ui->tempFilesTable->setModel(tempFilesModel.get());
+    ui->tempFilesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tempFilesTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+
+    ui->autostartTable->setModel(autostartModel.get());
+    ui->autostartTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui->autostartTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->autostartTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    ui->autostartTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
+    ui->autostartTable->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Stretch);
+    ui->autostartTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    prevCpuStats = Resmon::get_cpu_usage();
+
+    ui->taskManagerTable->setModel(taskManagerProxyModel.get());
 }
 
-void MainWindow::on_stopServiceButton_clicked()
-{
-    QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
-    if (selected.isEmpty()) {
-        logE("MainWindow: No service selected for stop");
-        showError(tr("Please select a service first"));
-        return;
-    }
+void MainWindow::setupTimers(){
+    resourceTimer = std::make_unique<QTimer>(this);
+    connect(resourceTimer.get(), &QTimer::timeout, this, [this]() {
+        updateCpuUsage();
+        updateSwapUsage();
+        updateRamUsage();
+        updateDiskUsage();
+        updateInternetUsage();
+        TmCtl->populateTaskManager();
+        SvcCtl->populateServicesTable();
+    });
 
-    QModelIndex sourceIndex = servicesProxyModel->mapToSource(selected.first());
-    QString serviceName = servicesModel->item(sourceIndex.row(), 0)->text();
-    QString serviceStatus = servicesModel->item(sourceIndex.row(), 2)->text();
-    int result = -1;
-    if (serviceName.isEmpty()) {
-        logE("MainWindow: Invalid service selected for stop");
-        showError(tr("Invalid service selected"));
-        return;
-    }
-
-    if (serviceStatus.compare("active", Qt::CaseInsensitive) == 0) {
-        logL(std::format("MainWindow: Stopping service: {}", serviceName.toStdString()));
-        result = stop_service(serviceName.toStdString());
-    }
-    else {
-        showInfo(tr("MainWindow: Service %1 is already stopped").arg(serviceName));
-        return;
-    }
-
-    if (result == 0) {
-        logL(std::format("MainWindow: Successfully stopped service: {}", serviceName.toStdString()));
-        showInfo(tr("Service stopped successfully"));
-        populateServicesTable();
-    } else {
-        logE(std::format("MainWindow: Failed to stop service: {}", serviceName.toStdString()));
-        showError(tr("Failed to stop service"));
-    }
+    createCpuLoadChart();
+    loadTheme(QString::fromStdString(cfg->getTheme()));
+    loadLanguage(QString::fromStdString(cfg->getLanguage()));
+    chartUpdateTimer = std::make_unique<QTimer>(this);
+    connect(chartUpdateTimer.get(), &QTimer::timeout, this, [this]() {
+        Resmon::CPUStats current = Resmon::get_cpu_usage();
+        double usage = current.usage_percent(prevCpuStats);
+        prevCpuStats = current;
+        updateChart(usage);
+    });
 }
 
-void MainWindow::on_enableServiceButton_clicked()
-{
-    QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
-    if (selected.isEmpty()) {
-        logE("MainWindow: No service selected for enable");
-        showError(tr("Please select a service first"));
-        return;
-    }
 
-    QModelIndex sourceIndex = servicesProxyModel->mapToSource(selected.first());
-    QString serviceName = servicesModel->item(sourceIndex.row(), 0)->text();
-    int result = -1;
-    if (serviceName.isEmpty()) {
-        logE("MainWindow: Invalid service selected for enable");
-        showError(tr("Invalid service selected"));
-        return;
-    }
-    if (!is_service_enabled(serviceName.toStdString())) {
-        logL(std::format("MainWindow: Enabling service: {}", serviceName.toStdString()));
-        result = enable_service(serviceName.toStdString());
-    }
-    else {
-        showInfo(tr("MainWindow: Service %1 is already enabled").arg(serviceName));
-        return;
-    }
-
-    if (result == 0) {
-        logL(std::format("MainWindow: Successfully enabled service: {}", serviceName.toStdString()));
-        showInfo(tr("Service enabled successfully"));
-        populateServicesTable();
-    } else {
-        logE(std::format("MainWindow: Failed to enable service: {}", serviceName.toStdString()));
-        showError(tr("Failed to enable service"));
-    }
-}
-
-void MainWindow::on_disableServiceButton_clicked()
-{
-    QModelIndexList selected = ui->servicesTable->selectionModel()->selectedRows();
-    if (selected.isEmpty()) {
-        logE("MainWindow: No service selected for disable");
-        showError(tr("Please select a service first"));
-        return;
-    }
-
-    QModelIndex sourceIndex = servicesProxyModel->mapToSource(selected.first());
-    QString serviceName = servicesModel->item(sourceIndex.row(), 0)->text();
-    int result = -1;
-    if (serviceName.isEmpty()) {
-        logE("MainWindow: Invalid service selected for disable");
-        showError(tr("Invalid service selected"));
-        return;
-    }
-    if (is_service_enabled(serviceName.toStdString())) {
-        logL(std::format("MainWindow: Disabling service: {}", serviceName.toStdString()));
-        result = disable_service(serviceName.toStdString());
-    }
-    else {
-        showInfo(tr("MainWindow: Service %1 is already disabled").arg(serviceName));
-        return;
-    }
-    if (result == 0) {
-        logL(std::format("MainWindow: Successfully disabled service: {}", serviceName.toStdString()));
-        showInfo(tr("Service disabled successfully"));
-        populateServicesTable();
-    } else {
-        logE(std::format("MainWindow: Failed to disable service: {}", serviceName.toStdString()));
-        showError(tr("Failed to disable service"));
-    }
-}
-
-void MainWindow::on_refreshServicesButton_clicked()
-{
-    logL("MainWindow: Refreshing services table");
-    populateServicesTable();
-    showInfo(tr("Service list refreshed"));
-}
-
-void MainWindow::on_selectAllFilesButton_clicked()
-{
-    logL("MainWindow: Selecting all temporary files");
-    ui->tempFilesTable->selectAll();
-}
-
-void MainWindow::on_clearSelectedFilesButton_clicked()
-{
-    logL("MainWindow: Clearing temporary files selection");
-    ui->tempFilesTable->clearSelection();
-}
 
 void MainWindow::on_catButton_clicked(){
     ui->catButton->setMaximumWidth(64);
@@ -504,262 +213,6 @@ void MainWindow::on_catButton_clicked(){
 }
 
 
-void MainWindow::on_deleteSelectedFilesButton_clicked()
-{
-    QModelIndexList selected = ui->tempFilesTable->selectionModel()->selectedRows();
-    if (selected.isEmpty()) {
-        logE("MainWindow: No files selected for deletion");
-        showError(tr("Please select files to delete"));
-        return;
-    }
-
-    logL(std::format("MainWindow: Attempting to delete {} files", selected.size()));
-    int deletedCount = 0;
-    int failedCount = 0;
-    QMessageBox::StandardButton reply = QMessageBox::question(
-        this,
-        tr("Confirm Deletion"),
-        tr("Are you sure you want to delete %1 selected file(s)?").arg(selected.size()),
-        QMessageBox::Yes | QMessageBox::No
-    );
-
-    if (reply != QMessageBox::Yes) {
-        return;
-    }
-
-    for (const QModelIndex& index : selected) {
-        QString filePath = tempFilesModel->item(index.row())->text();
-        try {
-            if (std::filesystem::remove(filePath.toStdString())) {
-                deletedCount++;
-                //logL(std::format("MainWindow: Deleted file: {}", filePath.toStdString()));
-            } else {
-                failedCount++;
-                logE(std::format("MainWindow: Failed to delete file: {}", filePath.toStdString()));
-            }
-        } catch (const std::exception& e) {
-            failedCount++;
-            logE(std::format("MainWindow: Exception when deleting {}: {}", filePath.toStdString(), e.what()));
-        }
-    }
-
-    for (int i = tempFilesModel->rowCount() - 1; i >= 0; --i) {
-        if (ui->tempFilesTable->selectionModel()->isRowSelected(i, QModelIndex())) {
-            tempFilesModel->removeRow(i);
-        }
-    }
-
-    showInfo(tr("Deleted %1 files, failed to delete %2 files").arg(deletedCount).arg(failedCount));
-    logL(std::format("MainWindow: Deletion completed: {} success, {} failures", deletedCount, failedCount));
-}
-
-void MainWindow::on_searchServicesTextChanged(const QString &text)
-{
-    logL(std::format("MainWindow: Filtering services with text: {}", text.toStdString()));
-    servicesProxyModel->setFilterKeyColumn(-1);
-    servicesProxyModel->setFilterFixedString(text);
-}
-
-void MainWindow::on_searchTaskLineEdit_textChanged(const QString &text)
-{
-    logL(std::format("MainWindow: Filtering tasks with text: {}", text.toStdString()));
-    taskManagerProxyModel->setFilterKeyColumn(-1);
-    taskManagerProxyModel->setFilterFixedString(text);
-}
-
-void MainWindow::on_addEntryButton_clicked()
-{
-    logL("MainWindow: Showing add autostart entry dialog");
-    AddAutostartDialog dialog(this);
-    dialog.exec();
-    QString filename = dialog.getFilename();
-    QString name = dialog.getName();
-    QString exec = dialog.getExec();
-    QString comment = dialog.getComment();
-    if (filename.isEmpty()){
-        filename = name;
-    }
-
-    if (name.isEmpty() || exec.isEmpty()) {
-        logE("MainWindow: Empty name or executable when adding autostart entry");
-        showError(tr("Name and Executable fields are required"));
-        return;
-    }
-
-    logL(std::format("MainWindow: Adding autostart entry: {}", name.toStdString()));
-    bool success = AutostartManager::addAutostartEntry(
-        filename.toStdString(),
-        name.toStdString(),
-        exec.toStdString(),
-        comment.toStdString());
-
-    if (success) {
-        logL(std::format("MainWindow: Successfully added autostart entry: {}", name.toStdString()));
-        showInfo(tr("Entry %1 has been added successfully").arg(name));
-        populateAutostartTable();
-    } else {
-        logE(std::format("MainWindow: Failed to add autostart entry: {}", name.toStdString()));
-        showError(tr("Entry %1 has not been added").arg(name));
-    }
-}
-
-void MainWindow::on_removeEntryButton_clicked()
-{
-    QModelIndexList selected = ui->autostartTable->selectionModel()->selectedRows();
-    if (selected.isEmpty()) {
-        logE("MainWindow: No autostart entry selected for removal");
-        showError(tr("Please select an entry first!"));
-        return;
-    }
-
-    QString filename = autostartModel->item(selected.first().row(), 0)->text();
-    QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, tr("Confirm Removal"),
-                                  tr("Are you sure you want to remove '%1'?").arg(filename),
-                                  QMessageBox::Yes|QMessageBox::No);
-
-    if (reply == QMessageBox::Yes) {
-        logL(std::format("MainWindow: Removing autostart entry: {}", filename.toStdString()));
-        bool success = AutostartManager::removeAutostartEntry(filename.toStdString());
-        if (success) {
-            logL(std::format("MainWindow: Successfully removed autostart entry: {}", filename.toStdString()));
-            showInfo(tr("Entry %1 removed successfully").arg(filename));
-        } else {
-            logE(std::format("MainWindow: Failed to remove autostart entry: {}", filename.toStdString()));
-            showError(tr("Failed to remove autostart entry %1").arg(filename));
-        }
-    } else {
-        logL("MainWindow:Autostart entry removal cancelled by user");
-    }
-}
-
-void MainWindow::on_enableEntryButton_clicked()
-{
-    QModelIndexList selected = ui->autostartTable->selectionModel()->selectedRows();
-    if (selected.isEmpty()) {
-        logE("MainWindow: No autostart entry selected for enable/disable");
-        showError(tr("Please select an entry first!"));
-        return;
-    }
-
-    QString name = autostartModel->item(selected.first().row(), 0)->text();
-    auto info = AutostartManager::getAutostartEntryInfo(name.toStdString());
-    bool statusBool = (QString::fromStdString(info["Status"]).toLower() == "true");
-
-    logL(std::format("MainWindow: Setting autostart entry {} to {}", name.toStdString(), !statusBool));
-    bool success = AutostartManager::setAutostartEntryEnabledStatus(name.toStdString(), !statusBool);
-    if (success) {
-        logL(std::format("MainWindow: Successfully changed status for autostart entry: {}", name.toStdString()));
-        showInfo(tr("Entry %1 has been %2!").arg(name).arg(statusBool ? tr("disabled") : tr("enabled")));
-        populateAutostartTable();
-    } else {
-        logE(std::format("MainWindow: Failed to change status for autostart entry: {}", name.toStdString()));
-        showError(tr("Error occurred"));
-    }
-}
-
-void MainWindow::on_updateEntriesButton_clicked()
-{
-    logL("MainWindow: Refreshing autostart entries");
-    populateAutostartTable();
-    showInfo(tr("Autostart Entries has been reloaded!"));
-}
-
-
-void MainWindow::on_startProcessButton_clicked() {
-    StartNewProcess procDialog(this);
-    procDialog.exec();
-    QString command = procDialog.getCommand();
-    bool isRoot = procDialog.isExecuteAsRoot();
-
-    if (command.isEmpty()) {
-        return;
-    }
-
-    QProcess* process = new QProcess(this);
-    QStringList arguments;
-
-    if (isRoot) {
-        arguments << "-E" << command;
-        process->start("sudo", arguments);
-    } else {
-        arguments << "-E" << "-u" << "#1000" << "sh" << "-c" << command;
-        process->start("sudo", arguments);
-        qDebug() << "My QStringList:" << arguments;
-    }
-
-
-    if (process->waitForStarted()) {
-        showInfo("Process started successfully!");
-    } else {
-        showError("Error. Failed to start process!");
-        process->deleteLater();
-    }
-
-}
-
-void MainWindow::on_stopProcessButton_clicked() {
-    QModelIndexList selected = ui->taskManagerTable->selectionModel()->selectedRows();
-    if (selected.isEmpty()) {
-        logE("MainWindow: No process was selected to stop");
-        showError(tr("Please select a process first!"));
-        return;
-    }
-    QModelIndex sourceIndex = taskManagerProxyModel->mapToSource(selected.first());
-
-    QString pidStr = taskManagerModel->item(sourceIndex.row(), 0)->text();
-    logF(pidStr.toStdString());
-    bool ok;
-    int pid = pidStr.toInt(&ok);
-
-    if (!ok || pid <= 0) {
-        logE(("MainWindow: Invalid PID format: " + pidStr).toStdString());
-        showError(tr("Invalid process ID"));
-        return;
-    }
-
-    QMessageBox::StandardButton reply = QMessageBox::question(
-        this,
-        tr("Confirm Process Termination"),
-        tr("Are you sure you want to terminate process %1?").arg(pid),
-        QMessageBox::Yes | QMessageBox::No
-        );
-
-    if (reply != QMessageBox::Yes) {
-        return;
-    }
-
-    QProcess process;
-    QStringList args;
-    args << "-15" << QString::number(pid);
-
-    process.start("kill", args);
-
-    if (!process.waitForFinished(2000)) {
-        logL("MainWindow: Process didn't respond to SIGTERM, trying SIGKILL");
-
-        QProcess killProcess;
-        QStringList killArgs;
-        killArgs << "-9" << QString::number(pid);
-        killProcess.start("kill", killArgs);
-        killProcess.waitForFinished(1000);
-    }
-
-    if (process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0) {
-        logL(("MainWindow: Successfully terminated process: " + pidStr).toStdString());
-        showInfo(tr("Process terminated successfully"));
-    } else {
-        logE(("MainWindow: Failed to terminate process: " + pidStr).toStdString());
-        showError(tr("Failed to terminate process"));
-    }
-
-    populateTaskManager();
-}
-
-void MainWindow::on_updateTasksButton_clicked(){
-    populateTaskManager();
-    showInfo("Task Manager was updated!");
-}
 
 void MainWindow::updateChart(double usage)
 {
@@ -773,6 +226,8 @@ void MainWindow::updateChart(double usage)
 
     axisX->setRange(x-xlim, x);
 }
+
+
 
 void MainWindow::updateCpuUsage()
 {

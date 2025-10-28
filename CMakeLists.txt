@@ -56,6 +56,10 @@ set(APP_SOURCES
     src/config_manager.cpp
     src/task_manager.cpp
     src/start_new_process_dialog.cpp
+    src/taskmanager_controller.cpp
+    src/autostart_controller.cpp
+    src/services_controller.cpp
+    src/tempfiles_controller.cpp
 )
 
 set(HEADERS
@@ -69,6 +73,11 @@ set(HEADERS
     include/config_manager.hpp
     include/task_manager.hpp
     include/start_new_process_dialog.hpp
+    include/mainincludes.hpp
+    include/taskmanager_controller.hpp
+    include/tempfiles_controller.hpp
+    include/autostart_controller.hpp
+    include/services_controller.hpp
 )
 
 set(FORMS mainwindow.ui)
@@ -119,6 +128,7 @@ add_executable(SystemManager
     ${HEADERS}
     ${FORMS}
     ${RESOURCES}
+    include/mainincludes.hpp
 )
 
 target_link_libraries(SystemManager

@@ -3,7 +3,7 @@
 #include <QMainWindow>
 #include <memory>
 #include <QTranslator>
-#include "../include/resource_monitor.hpp"
+#include "resource_monitor.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,6 +16,10 @@ class QChart;
 class QSplineSeries;
 class QValueAxis;
 class QChartView;
+class AutostartController;
+class TaskManagerController;
+class ServicesController;
+class TempfilesController;
 
 class Config;
 
@@ -29,25 +33,6 @@ public:
 
 
 private slots:
-    void on_scanTempFilesButton_clicked();
-    void on_startServiceButton_clicked();
-    void on_stopServiceButton_clicked();
-    void on_enableServiceButton_clicked();
-    void on_disableServiceButton_clicked();
-    void on_refreshServicesButton_clicked();
-    void on_deleteSelectedFilesButton_clicked();
-    void on_searchServicesTextChanged(const QString &text);
-    void on_searchTaskLineEdit_textChanged(const QString &text);
-    void on_addEntryButton_clicked();
-    void on_enableEntryButton_clicked();
-    void on_removeEntryButton_clicked();
-    void on_updateEntriesButton_clicked();
-    void on_selectAllFilesButton_clicked();
-    void on_clearSelectedFilesButton_clicked();
-    void on_startProcessButton_clicked();
-    void on_stopProcessButton_clicked();
-    void on_updateTasksButton_clicked();
-
     void on_catButton_clicked();
     void onThemeChanged(int index);
     void onLanguageChanged(int index);
@@ -67,9 +52,11 @@ private:
     QChartView* chartView = nullptr;
     std::unique_ptr<QTranslator> translator;
     std::unique_ptr<QTranslator> m_translator;
-    void populateServicesTable();
-    void populateTaskManager();
-    void populateAutostartTable();
+    std::unique_ptr<ServicesController> SvcCtl;
+    std::unique_ptr<TaskManagerController> TmCtl;
+    std::unique_ptr<AutostartController> AutostartCtl;
+    std::unique_ptr<TempfilesController> TempfilesCtl;
+    void setupControllers();
     void showError(const QString &message);
     void showInfo(const QString &message);
     void updateCpuUsage();
@@ -79,6 +66,12 @@ private:
     void updateSystemInfo();
     void updateInternetUsage();
     void createCpuLoadChart();
+    void setupUI();
+    void setupComboBoxes();
+    void setupModels();
+    void setupTables();
+    void setupTimers();
+    void setupProxyModel(QSortFilterProxyModel *proxy, QStandardItemModel   *source);
     void loadTheme(const QString& themeName);
     void updateChart(double usage);
     void loadLanguage(const QString &localeCode);
