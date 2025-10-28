@@ -2,9 +2,6 @@
 
 A system management tool with a Qt GUI interface.
 
-> [!IMPORTANT]
-> .
-
 ## Requirements
 - Qt 6.9 (nice)
 - Systemd development packages
