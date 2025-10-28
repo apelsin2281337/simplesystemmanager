@@ -18,6 +18,7 @@
 #include <QRandomGenerator>
 #include <QProcess>
 #include <thread>
+#include <QDebug>
 
 
 #include "../include/services.hpp"
@@ -35,19 +36,26 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , prevCpuStats(Resmon::get_cpu_usage())
+    , m_translator(new QTranslator(this))
     , lastNetworkStats(Resmon::get_internet_usage())
 
 {
     logL("MainWindow: Initializing MainWindow");
     ui->setupUi(this);
-    config = std::make_unique<Config>("config.json");
-    config->load();
-
+    cfg = std::make_unique<Config>("config.json");
+    cfg->load();
+    ui->retranslateUi(this);
+    ui->languageComboBox->addItem("Русский", "ru_RU");
+    ui->languageComboBox->addItem("English", "en_US");
     ui->themeComboBox->addItem(tr("Dark Theme"), "dark");
     ui->themeComboBox->addItem(tr("Light Theme"), "light");
     connect(ui->themeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onThemeChanged);
     ui->themeComboBox->setCurrentIndex(0);
+
+    connect(ui->languageComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onLanguageChanged);
+    ui->languageComboBox->setCurrentIndex(0);
 
     servicesModel = std::make_unique<QStandardItemModel>(this);
     servicesModel->setColumnCount(3);
@@ -79,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     autostartModel = std::make_unique<QStandardItemModel>(this);
     autostartModel->setColumnCount(3);
-    autostartModel->setHorizontalHeaderLabels({"Filename", tr("Name"), tr("Executable"), tr("Status"), tr("Comment")});
+    autostartModel->setHorizontalHeaderLabels({tr("Filename"), tr("Name"), tr("Executable"), tr("Status"), tr("Comment")});
     ui->autostartTable->setModel(autostartModel.get());
     ui->autostartTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->autostartTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
@@ -90,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent)
     prevCpuStats = Resmon::get_cpu_usage();
 
     taskManagerModel = std::make_unique<QStandardItemModel>(0, 6, this);
-    taskManagerModel->setHorizontalHeaderLabels({"PID", "Name", "CPU Load", "Memory Load", "Physical RAM", "Virtual RAM"});
+    taskManagerModel->setHorizontalHeaderLabels({tr("PID"), tr("Name"), tr("CPU Load"), tr("Memory Load"), tr("Physical RAM"), tr("Virtual RAM")});
 
     taskManagerProxyModel = std::make_unique<QSortFilterProxyModel>(this);
     taskManagerProxyModel->setSourceModel(taskManagerModel.get());
@@ -116,7 +124,8 @@ MainWindow::MainWindow(QWidget *parent)
     resourceTimer->start(1000);
 
     createCpuLoadChart();
-    loadTheme(QString::fromStdString(config->getTheme()));
+    loadTheme(QString::fromStdString(cfg->getTheme()));
+    loadLanguage(QString::fromStdString(cfg->getLanguage()));
     chartUpdateTimer = std::make_unique<QTimer>(this);
     connect(chartUpdateTimer.get(), &QTimer::timeout, this, [this]() {
         Resmon::CPUStats current = Resmon::get_cpu_usage();
@@ -879,8 +888,8 @@ void MainWindow::loadTheme(const QString& themeName) {
         QString styleSheet = QString(styleFile.readAll());
         qApp->setStyleSheet(styleSheet);
         styleFile.close();
-        config->setTheme(themeName.toStdString());
-        config->save();
+        cfg->setTheme(themeName.toStdString());
+        cfg->save();
         if (chart) {
             QColor textColor = (themeName == "dark") ? Qt::white : Qt::black;
             chart->setTitleBrush(QBrush(textColor));
@@ -895,6 +904,53 @@ void MainWindow::onThemeChanged(int index){
     QString themeName = ui->themeComboBox->itemData(index).toString();
     logF(themeName.toStdString());
     loadTheme(themeName);
+}
+
+void MainWindow::loadLanguage(const QString &localeCode)
+{
+    int index = ui->languageComboBox->findData(localeCode);
+    if (index != -1) {
+        const bool signalsBlocked = ui->languageComboBox->blockSignals(true);
+        ui->languageComboBox->setCurrentIndex(index);
+        ui->languageComboBox->blockSignals(signalsBlocked);
+    } else {
+        ui->languageComboBox->setCurrentIndex(0);
+    }
+
+    logL(std::format("MainWindow: Changing language to: {}", localeCode.toStdString()));
+
+    qApp->removeTranslator(m_translator.get());
+    m_translator = std::make_unique<QTranslator>(this);
+
+    QString translationFile = QString(":translations/qtguiinterface_%1.qm").arg(localeCode);
+    logL(std::format("MainWindow: Loading translation file: {}", translationFile.toStdString()));
+
+    if (m_translator->load(translationFile)) {
+        qApp->installTranslator(m_translator.get());
+        logL("MainWindow: Translation loaded successfully");
+    } else {
+        logE("MainWindow: Failed to load translation");
+    }
+
+    ui->retranslateUi(this);
+
+    servicesModel->setHorizontalHeaderLabels({tr("Service"), tr("Description"), tr("Status")});
+    autostartModel->setHorizontalHeaderLabels({tr("Filename"), tr("Name"), tr("Executable"), tr("Status"), tr("Comment")});
+    tempFilesModel->setHorizontalHeaderLabels({tr("File Path")});
+    taskManagerModel->setHorizontalHeaderLabels({tr("PID"), tr("Name"), tr("CPU Load"), tr("Memory Load"), tr("Physical RAM"), tr("Virtual RAM")});
+
+
+    chart->setTitle(tr("CPU Load Graph"));
+}
+
+void MainWindow::onLanguageChanged(int index)
+{
+    QString localeCode = ui->languageComboBox->itemData(index).toString();
+    loadLanguage(localeCode);
+
+    cfg->setLanguage(localeCode.toStdString());
+    qDebug() << localeCode;
+    cfg->save();
 }
 
 void MainWindow::showError(const QString &message)

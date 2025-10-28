@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 #include <memory>
+#include <QTranslator>
 #include "../include/resource_monitor.hpp"
 
 QT_BEGIN_NAMESPACE
@@ -46,8 +47,10 @@ private slots:
     void on_startProcessButton_clicked();
     void on_stopProcessButton_clicked();
     void on_updateTasksButton_clicked();
+
     void on_catButton_clicked();
     void onThemeChanged(int index);
+    void onLanguageChanged(int index);
 
 private:
     std::unique_ptr<Ui::MainWindow> ui;
@@ -62,7 +65,8 @@ private:
     QValueAxis* axisX = nullptr;
     QValueAxis* axisY = nullptr;
     QChartView* chartView = nullptr;
-
+    std::unique_ptr<QTranslator> translator;
+    std::unique_ptr<QTranslator> m_translator;
     void populateServicesTable();
     void populateTaskManager();
     void populateAutostartTable();
@@ -75,9 +79,9 @@ private:
     void updateSystemInfo();
     void updateInternetUsage();
     void createCpuLoadChart();
-    void loadLanguage(const QString &localeCode);
     void loadTheme(const QString& themeName);
     void updateChart(double usage);
+    void loadLanguage(const QString &localeCode);
     Resmon::CPUStats prevCpuStats;
     Resmon::NetworkStats lastNetworkStats{};
     std::unique_ptr<QTimer> resourceTimer;
@@ -85,7 +89,7 @@ private:
     std::unique_ptr<QTimer> processUpdateTimer;
     std::unique_ptr<QDialog> newEntryDialog;
     std::unique_ptr<QTimer> networkTimer;
-    std::unique_ptr<Config> config;
+    std::unique_ptr<Config> cfg;
 };
 
 

@@ -19,6 +19,7 @@ bool Config::load() {
         file.close();
 
         theme_ = data_.value("theme", "dark");
+        language_ = data_.value("language", "en_US");
 
         return true;
     } catch (const std::exception& e) {
@@ -31,6 +32,7 @@ bool Config::load() {
 bool Config::save() {
     try {
         data_["theme"] = theme_;
+        data_["language"] = language_;
 
         std::ofstream file(filename_);
         if (!file.is_open()) {
@@ -50,4 +52,5 @@ bool Config::save() {
 void Config::clear() {
     data_.clear();
     theme_ = "dark";
+    language_ = "en_US";
 }

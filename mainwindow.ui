@@ -15,8 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources/icon.qrc">
-    <normaloff>:/icon.ico</normaloff>
-   </iconset>
+    <normaloff>:/icon.ico</normaloff>:/icon.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -33,9 +32,19 @@
        <widget class="QComboBox" name="themeComboBox"/>
       </item>
       <item>
+       <widget class="QLabel" name="languageLabel">
+        <property name="text">
+         <string>Language</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="languageComboBox"/>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -51,7 +60,7 @@
          <string>Cat Generator</string>
         </property>
         <property name="textInteractionFlags">
-         <set>Qt::NoTextInteraction</set>
+         <set>Qt::TextInteractionFlag::NoTextInteraction</set>
         </property>
        </widget>
       </item>
@@ -118,7 +127,7 @@
                 </font>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -166,7 +175,7 @@
                   <string/>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -200,7 +209,7 @@
                   </font>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -244,7 +253,7 @@
                   <string/>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -269,7 +278,7 @@
                   <string>Download: 0 KB/s</string>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -279,7 +288,7 @@
                   <string>Upload: 0 KB/s</string>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -312,6 +321,9 @@
              <bool>false</bool>
             </attribute>
            </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox"/>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
