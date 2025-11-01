@@ -11,7 +11,7 @@ A system management tool with a Qt GUI interface.
 
 
 > [!IMPORTANT]
-> Building guide and dependencies may be wrong or outdated. I just dont have enough time nor do i have a motivation to maintain a readme. Surely nobody's doing this without my guidance anyway. Thanks!
+> Building guide and dependencies may be wrong or outdated. I just dont have enough time nor do i have motivation to maintain a readme. Surely nobody's doing this without my guidance anyway. But if you do and you know what you are doing i have a convenience script called ball to compile this project. Thanks!
 
 ## Building
 ```bash

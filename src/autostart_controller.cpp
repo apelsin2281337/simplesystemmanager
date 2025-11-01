@@ -54,7 +54,7 @@ void AutostartController::on_addEntryButton_clicked()
 
     if (name.isEmpty() || exec.isEmpty()) {
         logE("AutostartController: Empty name or executable when adding autostart entry");
-        error(tr("Name and Executable fields are required"));
+        emit error(tr("Name and Executable fields are required"));
         return;
     }
 
@@ -67,11 +67,11 @@ void AutostartController::on_addEntryButton_clicked()
 
     if (success) {
         logL(std::format("AutostartController: Successfully added autostart entry: {}", name.toStdString()));
-        info(tr("Entry %1 has been added successfully").arg(name));
+        emit info(tr("Entry %1 has been added successfully").arg(name));
         populateAutostartTable();
     } else {
         logE(std::format("AutostartController: Failed to add autostart entry: {}", name.toStdString()));
-        error(tr("Entry %1 has not been added").arg(name));
+        emit error(tr("Entry %1 has not been added").arg(name));
     }
 }
 
@@ -80,7 +80,7 @@ void AutostartController::on_removeEntryButton_clicked()
     QModelIndexList selected = m_table->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
         logE("AutostartController: No autostart entry selected for removal");
-        error(tr("Please select an entry first!"));
+        emit error(tr("Please select an entry first!"));
         return;
     }
 
@@ -95,10 +95,10 @@ void AutostartController::on_removeEntryButton_clicked()
         bool success = AutostartManager::removeAutostartEntry(filename.toStdString());
         if (success) {
             logL(std::format("AutostartController: Successfully removed autostart entry: {}", filename.toStdString()));
-            info(tr("Entry %1 removed successfully").arg(filename));
+            emit info(tr("Entry %1 removed successfully").arg(filename));
         } else {
             logE(std::format("AutostartController: Failed to remove autostart entry: {}", filename.toStdString()));
-            error(tr("Failed to remove autostart entry %1").arg(filename));
+            emit error(tr("Failed to remove autostart entry %1").arg(filename));
         }
     } else {
         logL("AutostartController:Autostart entry removal cancelled by user");
@@ -110,7 +110,7 @@ void AutostartController::on_enableEntryButton_clicked()
     QModelIndexList selected = m_table->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
         logE("AutostartController: No autostart entry selected for enable/disable");
-        error(tr("Please select an entry first!"));
+        emit error(tr("Please select an entry first!"));
         return;
     }
 
@@ -122,11 +122,11 @@ void AutostartController::on_enableEntryButton_clicked()
     bool success = AutostartManager::setAutostartEntryEnabledStatus(name.toStdString(), !statusBool);
     if (success) {
         logL(std::format("AutostartController: Successfully changed status for autostart entry: {}", name.toStdString()));
-        info(tr("Entry %1 has been %2!").arg(name).arg(statusBool ? tr("disabled") : tr("enabled")));
+        emit info(tr("Entry %1 has been %2!").arg(name).arg(statusBool ? tr("disabled") : tr("enabled")));
         populateAutostartTable();
     } else {
         logE(std::format("AutostartController: Failed to change status for autostart entry: {}", name.toStdString()));
-        error(tr("Error occurred"));
+        emit error(tr("Error occurred"));
     }
 }
 
@@ -134,5 +134,5 @@ void AutostartController::on_updateEntriesButton_clicked()
 {
     logL("AutostartController: Refreshing autostart entries");
     populateAutostartTable();
-    info(tr("Autostart Entries has been reloaded!"));
+    emit info(tr("Autostart Entries has been reloaded!"));
 }

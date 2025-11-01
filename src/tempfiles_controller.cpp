@@ -36,7 +36,7 @@ void TempfilesController::on_scanTempFilesButton_clicked()
 
             if (!folder_contents) {
                 logE(folder_contents.error());
-                error(QString::fromStdString(folder_contents.error()));
+                emit error(QString::fromStdString(folder_contents.error()));
                 continue;
             }
 
@@ -45,12 +45,12 @@ void TempfilesController::on_scanTempFilesButton_clicked()
             }
         }
 
-        info(tr("Found %1 temporary files").arg(m_model->rowCount()));
+        emit info(tr("Found %1 temporary files").arg(m_model->rowCount()));
         logL(std::format("TempfilesController: Found {} temporary files", m_model->rowCount()));
     }
     catch (const std::exception& e) {
         logE(std::format("TempfilesController: Error scanning temp files: {}", e.what()));
-        error(tr("Error: ") + e.what());
+        emit error(tr("Error: ") + e.what());
     }
 }
 
@@ -71,7 +71,7 @@ void TempfilesController::on_deleteSelectedFilesButton_clicked()
     QModelIndexList selected = m_table->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
         logE("TempfilesController: No files selected for deletion");
-        error(tr("Please select files to delete"));
+        emit error(tr("Please select files to delete"));
         return;
     }
 
@@ -111,6 +111,6 @@ void TempfilesController::on_deleteSelectedFilesButton_clicked()
         }
     }
 
-    info(tr("Deleted %1 files, failed to delete %2 files").arg(deletedCount).arg(failedCount));
+    emit info(tr("Deleted %1 files, failed to delete %2 files").arg(deletedCount).arg(failedCount));
     logL(std::format("TempfilesController: Deletion completed: {} success, {} failures", deletedCount, failedCount));
 }

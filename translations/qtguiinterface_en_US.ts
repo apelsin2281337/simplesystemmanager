@@ -33,6 +33,75 @@
     </message>
 </context>
 <context>
+    <name>AutostartController</name>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="57"/>
+        <source>Name and Executable fields are required</source>
+        <translation>Name and Executable fields are required</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="70"/>
+        <source>Entry %1 has been added successfully</source>
+        <translation>Entry %1 has been added successfully</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="74"/>
+        <source>Entry %1 has not been added</source>
+        <translation>Entry %1 has not been added</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="83"/>
+        <location filename="../src/autostart_controller.cpp" line="113"/>
+        <source>Please select an entry first!</source>
+        <translation>Please select an entry first!</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="89"/>
+        <source>Confirm Removal</source>
+        <translation>Confirm Removal</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="90"/>
+        <source>Are you sure you want to remove &apos;%1&apos;?</source>
+        <translation>Are you sure you want to remove &apos;%1&apos;?</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="98"/>
+        <source>Entry %1 removed successfully</source>
+        <translation>Entry %1 removed successfully</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="101"/>
+        <source>Failed to remove autostart entry %1</source>
+        <translation>Failed to remove autostart entry %1</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="125"/>
+        <source>Entry %1 has been %2!</source>
+        <translation>Entry %1 has been %2!</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="125"/>
+        <source>disabled</source>
+        <translation>disabled</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="125"/>
+        <source>enabled</source>
+        <translation>enabled</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="129"/>
+        <source>Error occurred</source>
+        <translation>Error occurred</translation>
+    </message>
+    <message>
+        <location filename="../src/autostart_controller.cpp" line="137"/>
+        <source>Autostart Entries has been reloaded!</source>
+        <translation>Autostart Entries has been reloaded!</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <source>System Management Tool</source>
@@ -218,312 +287,274 @@
         <translation>Update Entries</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="61"/>
-        <location filename="../src/mainwindow.cpp" line="935"/>
+        <location filename="../src/mainwindow.cpp" line="102"/>
+        <location filename="../src/mainwindow.cpp" line="392"/>
         <source>Service</source>
         <translation>Service</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="61"/>
-        <location filename="../src/mainwindow.cpp" line="935"/>
+        <location filename="../src/mainwindow.cpp" line="102"/>
+        <location filename="../src/mainwindow.cpp" line="392"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="61"/>
-        <location filename="../src/mainwindow.cpp" line="89"/>
-        <location filename="../src/mainwindow.cpp" line="935"/>
+        <location filename="../src/mainwindow.cpp" line="102"/>
+        <location filename="../src/mainwindow.cpp" line="118"/>
+        <location filename="../src/mainwindow.cpp" line="392"/>
+        <location filename="../src/mainwindow.cpp" line="393"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="89"/>
-        <location filename="../src/mainwindow.cpp" line="100"/>
-        <location filename="../src/mainwindow.cpp" line="936"/>
+        <location filename="../src/mainwindow.cpp" line="117"/>
+        <location filename="../src/mainwindow.cpp" line="124"/>
+        <location filename="../src/mainwindow.cpp" line="393"/>
+        <location filename="../src/mainwindow.cpp" line="395"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="89"/>
-        <location filename="../src/mainwindow.cpp" line="936"/>
+        <location filename="../src/mainwindow.cpp" line="117"/>
+        <location filename="../src/mainwindow.cpp" line="393"/>
         <source>Executable</source>
         <translation>Executable</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="89"/>
-        <location filename="../src/mainwindow.cpp" line="936"/>
+        <location filename="../src/mainwindow.cpp" line="118"/>
+        <location filename="../src/mainwindow.cpp" line="393"/>
         <source>Comment</source>
         <translation>Comment</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="89"/>
+        <location filename="../src/mainwindow.cpp" line="117"/>
+        <location filename="../src/mainwindow.cpp" line="393"/>
         <source>Filename</source>
         <translation>Filename</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="100"/>
+        <location filename="../src/mainwindow.cpp" line="124"/>
+        <location filename="../src/mainwindow.cpp" line="395"/>
         <source>PID</source>
         <translation>PID</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="100"/>
+        <location filename="../src/mainwindow.cpp" line="124"/>
+        <location filename="../src/mainwindow.cpp" line="395"/>
         <source>CPU Load</source>
         <translation>CPU Load</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="100"/>
+        <location filename="../src/mainwindow.cpp" line="125"/>
+        <location filename="../src/mainwindow.cpp" line="395"/>
         <source>Memory Load</source>
         <translation>Memory Load</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="100"/>
+        <location filename="../src/mainwindow.cpp" line="125"/>
+        <location filename="../src/mainwindow.cpp" line="395"/>
         <source>Physical RAM</source>
         <translation>Physical RAM</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="100"/>
+        <location filename="../src/mainwindow.cpp" line="125"/>
+        <location filename="../src/mainwindow.cpp" line="395"/>
         <source>Virtual RAM</source>
         <translation>Virtual RAM</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="143"/>
+        <location filename="../src/mainwindow.cpp" line="31"/>
         <source>CPU Usage (%1)</source>
         <translation>CPU Usage (%1)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="144"/>
+        <location filename="../src/mainwindow.cpp" line="32"/>
         <source>Network Usage (%1)</source>
         <translation>Network Usage (%1)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="318"/>
         <source>Found %1 temporary files</source>
-        <translation>Found %1 temporary files</translation>
+        <translation type="vanished">Found %1 temporary files</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="323"/>
         <source>Error: </source>
-        <translation>Error: </translation>
+        <translation type="vanished">Error: </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="332"/>
-        <location filename="../src/mainwindow.cpp" line="370"/>
-        <location filename="../src/mainwindow.cpp" line="408"/>
-        <location filename="../src/mainwindow.cpp" line="444"/>
         <source>Please select a service first</source>
-        <translation>Please select a service first</translation>
+        <translation type="vanished">Please select a service first</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="342"/>
-        <location filename="../src/mainwindow.cpp" line="380"/>
-        <location filename="../src/mainwindow.cpp" line="417"/>
-        <location filename="../src/mainwindow.cpp" line="453"/>
         <source>Invalid service selected</source>
-        <translation>Invalid service selected</translation>
+        <translation type="vanished">Invalid service selected</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="351"/>
         <source>MainWindow: Service %1 is already started</source>
-        <translation>MainWindow: Service %1 is already started</translation>
+        <translation type="vanished">MainWindow: Service %1 is already started</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="357"/>
         <source>Service started successfully</source>
-        <translation>Service started successfully</translation>
+        <translation type="vanished">Service started successfully</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="361"/>
         <source>Failed to start service</source>
-        <translation>Failed to start service</translation>
+        <translation type="vanished">Failed to start service</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="389"/>
         <source>MainWindow: Service %1 is already stopped</source>
-        <translation>MainWindow: Service %1 is already stopped</translation>
+        <translation type="vanished">MainWindow: Service %1 is already stopped</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="395"/>
         <source>Service stopped successfully</source>
-        <translation>Service stopped successfully</translation>
+        <translation type="vanished">Service stopped successfully</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="399"/>
         <source>Failed to stop service</source>
-        <translation>Failed to stop service</translation>
+        <translation type="vanished">Failed to stop service</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="425"/>
         <source>MainWindow: Service %1 is already enabled</source>
-        <translation>MainWindow: Service %1 is already enabled</translation>
+        <translation type="vanished">MainWindow: Service %1 is already enabled</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="431"/>
         <source>Service enabled successfully</source>
-        <translation>Service enabled successfully</translation>
+        <translation type="vanished">Service enabled successfully</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="435"/>
         <source>Failed to enable service</source>
-        <translation>Failed to enable service</translation>
+        <translation type="vanished">Failed to enable service</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="461"/>
         <source>MainWindow: Service %1 is already disabled</source>
-        <translation>MainWindow: Service %1 is already disabled</translation>
+        <translation type="vanished">MainWindow: Service %1 is already disabled</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="466"/>
         <source>Service disabled successfully</source>
-        <translation>Service disabled successfully</translation>
+        <translation type="vanished">Service disabled successfully</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="470"/>
         <source>Failed to disable service</source>
-        <translation>Failed to disable service</translation>
+        <translation type="vanished">Failed to disable service</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="478"/>
         <source>Service list refreshed</source>
-        <translation>Service list refreshed</translation>
+        <translation type="vanished">Service list refreshed</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="511"/>
         <source>Please select files to delete</source>
-        <translation>Please select files to delete</translation>
+        <translation type="vanished">Please select files to delete</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="520"/>
         <source>Confirm Deletion</source>
-        <translation>Confirm Deletion</translation>
+        <translation type="vanished">Confirm Deletion</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="521"/>
         <source>Are you sure you want to delete %1 selected file(s)?</source>
-        <translation>Are you sure you want to delete %1 selected file(s)?</translation>
+        <translation type="vanished">Are you sure you want to delete %1 selected file(s)?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="551"/>
         <source>Deleted %1 files, failed to delete %2 files</source>
-        <translation>Deleted %1 files, failed to delete %2 files</translation>
+        <translation type="vanished">Deleted %1 files, failed to delete %2 files</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="652"/>
         <source>Entry %1 has been %2!</source>
-        <translation>Entry %1 has been %2!</translation>
+        <translation type="vanished">Entry %1 has been %2!</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="652"/>
         <source>disabled</source>
-        <translation>disabled</translation>
+        <translation type="vanished">disabled</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="652"/>
         <source>enabled</source>
-        <translation>enabled</translation>
+        <translation type="vanished">enabled</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="656"/>
         <source>Error occurred</source>
-        <translation>Error occurred</translation>
+        <translation type="vanished">Error occurred</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="704"/>
         <source>Please select a process first!</source>
-        <translation>Please select a process first!</translation>
+        <translation type="vanished">Please select a process first!</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="716"/>
         <source>Invalid process ID</source>
-        <translation>Invalid process ID</translation>
+        <translation type="vanished">Invalid process ID</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="722"/>
         <source>Confirm Process Termination</source>
-        <translation>Confirm Process Termination</translation>
+        <translation type="vanished">Confirm Process Termination</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="723"/>
         <source>Are you sure you want to terminate process %1?</source>
-        <translation>Are you sure you want to terminate process %1?</translation>
+        <translation type="vanished">Are you sure you want to terminate process %1?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="749"/>
         <source>Process terminated successfully</source>
-        <translation>Process terminated successfully</translation>
+        <translation type="vanished">Process terminated successfully</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="752"/>
         <source>Failed to terminate process</source>
-        <translation>Failed to terminate process</translation>
+        <translation type="vanished">Failed to terminate process</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="833"/>
-        <location filename="../src/mainwindow.cpp" line="938"/>
+        <location filename="../src/mainwindow.cpp" line="289"/>
+        <location filename="../src/mainwindow.cpp" line="398"/>
         <source>CPU Load Graph</source>
         <translation>CPU Load Graph</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="784"/>
+        <location filename="../src/mainwindow.cpp" line="240"/>
         <source>%1%</source>
         <translation>%1%</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="794"/>
-        <location filename="../src/mainwindow.cpp" line="807"/>
-        <location filename="../src/mainwindow.cpp" line="820"/>
+        <location filename="../src/mainwindow.cpp" line="250"/>
+        <location filename="../src/mainwindow.cpp" line="263"/>
+        <location filename="../src/mainwindow.cpp" line="276"/>
         <source>%1% (%2 MB / %3 MB)</source>
         <translation>%1% (%2 MB / %3 MB)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="584"/>
         <source>Name and Executable fields are required</source>
-        <translation>CPU Load Graph</translation>
+        <translation type="vanished">CPU Load Graph</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="49"/>
+        <location filename="../src/mainwindow.cpp" line="46"/>
         <source>Dark Theme</source>
         <translation>Dark Theme</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="50"/>
+        <location filename="../src/mainwindow.cpp" line="47"/>
         <source>Light Theme</source>
         <translation>Light Theme</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="597"/>
         <source>Entry %1 has been added successfully</source>
-        <translation>Entry %1 has been added successfully</translation>
+        <translation type="vanished">Entry %1 has been added successfully</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="601"/>
         <source>Entry %1 has not been added</source>
-        <translation>Entry %1 has not been added</translation>
+        <translation type="vanished">Entry %1 has not been added</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="610"/>
-        <location filename="../src/mainwindow.cpp" line="640"/>
         <source>Please select an entry first!</source>
-        <translation>Please select an entry first!</translation>
+        <translation type="vanished">Please select an entry first!</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="616"/>
         <source>Confirm Removal</source>
-        <translation>Confirm Removal</translation>
+        <translation type="vanished">Confirm Removal</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="617"/>
         <source>Are you sure you want to remove &apos;%1&apos;?</source>
-        <translation>Are you sure you want to remove &apos;%1&apos;?</translation>
+        <translation type="vanished">Are you sure you want to remove &apos;%1&apos;?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="625"/>
         <source>Entry %1 removed successfully</source>
-        <translation>Entry %1 removed successfully</translation>
+        <translation type="vanished">Entry %1 removed successfully</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="628"/>
         <source>Failed to remove autostart entry %1</source>
-        <translation>Failed to remove autostart entry %1</translation>
+        <translation type="vanished">Failed to remove autostart entry %1</translation>
     </message>
     <message>
         <source>Entry %1 has been disabled!</source>
@@ -538,33 +569,32 @@
         <translation type="vanished">Entry %1 has been enabled!</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="664"/>
         <source>Autostart Entries has been reloaded!</source>
-        <translation>Autostart Entries has been reloaded!</translation>
+        <translation type="vanished">Autostart Entries has been reloaded!</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="82"/>
-        <location filename="../src/mainwindow.cpp" line="937"/>
+        <location filename="../src/mainwindow.cpp" line="111"/>
+        <location filename="../src/mainwindow.cpp" line="394"/>
         <source>File Path</source>
         <translation>File Path</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="872"/>
+        <location filename="../src/mainwindow.cpp" line="328"/>
         <source>Download: %1</source>
         <translation>Download: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="873"/>
+        <location filename="../src/mainwindow.cpp" line="329"/>
         <source>Upload: %1</source>
         <translation>Upload: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="954"/>
+        <location filename="../src/mainwindow.cpp" line="414"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="960"/>
+        <location filename="../src/mainwindow.cpp" line="420"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
@@ -581,6 +611,54 @@
     </message>
 </context>
 <context>
+    <name>ServicesController</name>
+    <message>
+        <location filename="../src/services_controller.cpp" line="25"/>
+        <source>Please select a service first</source>
+        <translation>Please select a service first</translation>
+    </message>
+    <message>
+        <source>Invalid service selected</source>
+        <translation type="obsolete">Invalid service selected</translation>
+    </message>
+    <message>
+        <source>Service started successfully</source>
+        <translation type="obsolete">Service started successfully</translation>
+    </message>
+    <message>
+        <source>Failed to start service</source>
+        <translation type="obsolete">Failed to start service</translation>
+    </message>
+    <message>
+        <source>Service stopped successfully</source>
+        <translation type="obsolete">Service stopped successfully</translation>
+    </message>
+    <message>
+        <source>Failed to stop service</source>
+        <translation type="obsolete">Failed to stop service</translation>
+    </message>
+    <message>
+        <source>Service enabled successfully</source>
+        <translation type="obsolete">Service enabled successfully</translation>
+    </message>
+    <message>
+        <source>Failed to enable service</source>
+        <translation type="obsolete">Failed to enable service</translation>
+    </message>
+    <message>
+        <source>Service disabled successfully</source>
+        <translation type="obsolete">Service disabled successfully</translation>
+    </message>
+    <message>
+        <source>Failed to disable service</source>
+        <translation type="obsolete">Failed to disable service</translation>
+    </message>
+    <message>
+        <source>Service list refreshed</source>
+        <translation type="obsolete">Service list refreshed</translation>
+    </message>
+</context>
+<context>
     <name>StartNewProcess</name>
     <message>
         <location filename="../src/start_new_process_dialog.cpp" line="20"/>
@@ -591,6 +669,72 @@
         <location filename="../src/start_new_process_dialog.cpp" line="21"/>
         <source>Execute as Root:</source>
         <translation>Execute as Root:</translation>
+    </message>
+</context>
+<context>
+    <name>TaskManagerController</name>
+    <message>
+        <location filename="../src/taskmanager_controller.cpp" line="132"/>
+        <source>Please select a process first!</source>
+        <translation>Please select a process first!</translation>
+    </message>
+    <message>
+        <location filename="../src/taskmanager_controller.cpp" line="144"/>
+        <source>Invalid process ID</source>
+        <translation>Invalid process ID</translation>
+    </message>
+    <message>
+        <location filename="../src/taskmanager_controller.cpp" line="150"/>
+        <source>Confirm Process Termination</source>
+        <translation>Confirm Process Termination</translation>
+    </message>
+    <message>
+        <location filename="../src/taskmanager_controller.cpp" line="151"/>
+        <source>Are you sure you want to terminate process %1?</source>
+        <translation>Are you sure you want to terminate process %1?</translation>
+    </message>
+    <message>
+        <location filename="../src/taskmanager_controller.cpp" line="177"/>
+        <source>Process terminated successfully</source>
+        <translation>Process terminated successfully</translation>
+    </message>
+    <message>
+        <location filename="../src/taskmanager_controller.cpp" line="180"/>
+        <source>Failed to terminate process</source>
+        <translation>Failed to terminate process</translation>
+    </message>
+</context>
+<context>
+    <name>TempfilesController</name>
+    <message>
+        <location filename="../src/tempfiles_controller.cpp" line="48"/>
+        <source>Found %1 temporary files</source>
+        <translation>Found %1 temporary files</translation>
+    </message>
+    <message>
+        <location filename="../src/tempfiles_controller.cpp" line="53"/>
+        <source>Error: </source>
+        <translation>Error: </translation>
+    </message>
+    <message>
+        <location filename="../src/tempfiles_controller.cpp" line="74"/>
+        <source>Please select files to delete</source>
+        <translation>Please select files to delete</translation>
+    </message>
+    <message>
+        <location filename="../src/tempfiles_controller.cpp" line="83"/>
+        <source>Confirm Deletion</source>
+        <translation>Confirm Deletion</translation>
+    </message>
+    <message>
+        <location filename="../src/tempfiles_controller.cpp" line="84"/>
+        <source>Are you sure you want to delete %1 selected file(s)?</source>
+        <translation>Are you sure you want to delete %1 selected file(s)?</translation>
+    </message>
+    <message>
+        <location filename="../src/tempfiles_controller.cpp" line="114"/>
+        <source>Deleted %1 files, failed to delete %2 files</source>
+        <translation>Deleted %1 files, failed to delete %2 files</translation>
     </message>
 </context>
 </TS>

@@ -120,7 +120,6 @@ std::vector<std::string> AutostartManager::listAutostartEntries(){
         if (entry.path().extension() == ".desktop") {
             std::string entryPath = entry.path().stem().string();
             entries.push_back(entryPath);
-            logF(entryPath);
             i++;
         }
     }

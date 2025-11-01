@@ -31,9 +31,15 @@ std::vector<ProcessInfo> TaskManager::getProcessesInfo() {
     return processes;
 }
 
+
 ProcessInfo TaskManager::parseLine(const std::string& line){
     ProcessInfo proc;
     std::istringstream iss(line);
-    iss >> proc.user >> proc.pid >> proc.cpuLoad >> proc.memLoad >> proc.vsz >> proc.rss >> proc.tty >> proc.stat >> proc.start >> proc.time >> proc.command;
+    iss >> proc.user >> proc.pid >> proc.cpuLoad >> proc.memLoad >> proc.vsz >> proc.rss >> proc.tty >> proc.stat >> proc.start >> proc.time;
+
+    std::getline(iss, proc.command);
+    if (!proc.command.empty() && proc.command[0] == ' ')
+        proc.command.erase(0, 1);
+
     return proc;
 }

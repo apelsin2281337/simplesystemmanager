@@ -31,8 +31,8 @@ void ServicesController::on_startServiceButton_clicked()
     QString serviceStatus = m_model->item(sourceIndex.row(), 2)->text();
     int result = -1;
     if (serviceName.isEmpty()) {
-        logE("ServicesController: Invalid service selected for start");
-        emit error(tr("Invalid service selected"));
+        logE("ServicesController: Invalid service selected to start");
+        emit error("Invalid service selected");
         return;
     }
 
@@ -41,17 +41,17 @@ void ServicesController::on_startServiceButton_clicked()
         result = start_service(serviceName.toStdString());
     }
     else {
-        emit info(tr("ServicesController: Service %1 is already started").arg(serviceName));
+        emit info(QString("ServicesController: Service %1 is already started").arg(serviceName));
         return;
     }
 
     if (result == 0) {
         logL(std::format("ServicesController: Successfully started service: {}", serviceName.toStdString()));
-        emit info(tr("Service started successfully"));
+        emit info("Service started successfully");
         populateServicesTable();
     } else {
         logE(std::format("ServicesController: Failed to start service: {}", serviceName.toStdString()));
-        emit error(tr("Failed to start service"));
+        emit error("Failed to start service");
     }
 }
 
@@ -60,7 +60,7 @@ void ServicesController::on_stopServiceButton_clicked()
     QModelIndexList selected = m_table->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
         logE("ServicesController: No service selected for stop");
-        emit error(tr("Please select a service first"));
+        emit error("Please select a service first");
         return;
     }
 
@@ -70,7 +70,7 @@ void ServicesController::on_stopServiceButton_clicked()
     int result = -1;
     if (serviceName.isEmpty()) {
         logE("ServicesController: Invalid service selected for stop");
-        emit error(tr("Invalid service selected"));
+        emit error("Invalid service selected");
         return;
     }
 
@@ -79,17 +79,17 @@ void ServicesController::on_stopServiceButton_clicked()
         result = stop_service(serviceName.toStdString());
     }
     else {
-        emit info(tr("ServicesController: Service %1 is already stopped").arg(serviceName));
+        emit info(QString("ServicesController: Service %1 is already stopped").arg(serviceName));
         return;
     }
 
     if (result == 0) {
         logL(std::format("ServicesController: Successfully stopped service: {}", serviceName.toStdString()));
-        emit info(tr("Service stopped successfully"));
+        emit info("Service stopped successfully");
         populateServicesTable();
     } else {
         logE(std::format("ServicesController: Failed to stop service: {}", serviceName.toStdString()));
-        emit error(tr("Failed to stop service"));
+        emit error("Failed to stop service");
     }
 }
 
@@ -98,7 +98,7 @@ void ServicesController::on_enableServiceButton_clicked()
     QModelIndexList selected = m_table->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
         logE("ServicesController: No service selected for enable");
-        emit error(tr("Please select a service first"));
+        emit error("Please select a service first");
         return;
     }
 
@@ -107,7 +107,7 @@ void ServicesController::on_enableServiceButton_clicked()
     int result = -1;
     if (serviceName.isEmpty()) {
         logE("ServicesController: Invalid service selected for enable");
-        emit error(tr("Invalid service selected"));
+        emit error("Invalid service selected");
         return;
     }
     if (!is_service_enabled(serviceName.toStdString())) {
@@ -115,17 +115,17 @@ void ServicesController::on_enableServiceButton_clicked()
         result = enable_service(serviceName.toStdString());
     }
     else {
-        emit info(tr("ServicesController: Service %1 is already enabled").arg(serviceName));
+        emit info(QString("ServicesController: Service %1 is already enabled").arg(serviceName));
         return;
     }
 
     if (result == 0) {
         logL(std::format("ServicesController: Successfully enabled service: {}", serviceName.toStdString()));
-        emit info(tr("Service enabled successfully"));
+        emit info("Service enabled successfully");
         populateServicesTable();
     } else {
         logE(std::format("ServicesController: Failed to enable service: {}", serviceName.toStdString()));
-        emit error(tr("Failed to enable service"));
+        emit error("Failed to enable service");
     }
 }
 
@@ -134,7 +134,7 @@ void ServicesController::on_disableServiceButton_clicked()
     QModelIndexList selected = m_table->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
         logE("ServicesController: No service selected for disable");
-        emit error(tr("Please select a service first"));
+        emit error("Please select a service first");
         return;
     }
 
@@ -143,7 +143,7 @@ void ServicesController::on_disableServiceButton_clicked()
     int result = -1;
     if (serviceName.isEmpty()) {
         logE("ServicesController: Invalid service selected for disable");
-        emit error(tr("Invalid service selected"));
+        emit error("Invalid service selected");
         return;
     }
     if (is_service_enabled(serviceName.toStdString())) {
@@ -151,16 +151,16 @@ void ServicesController::on_disableServiceButton_clicked()
         result = disable_service(serviceName.toStdString());
     }
     else {
-        emit info(tr("ServicesController: Service %1 is already disabled").arg(serviceName));
+        emit info(QString("ServicesController: Service %1 is already disabled").arg(serviceName));
         return;
     }
     if (result == 0) {
         logL(std::format("ServicesController: Successfully disabled service: {}", serviceName.toStdString()));
-        emit info(tr("Service disabled successfully"));
+        emit info("Service disabled successfully");
         populateServicesTable();
     } else {
         logE(std::format("ServicesController: Failed to disable service: {}", serviceName.toStdString()));
-        emit error(tr("Failed to disable service"));
+        emit error("Failed to disable service");
     }
 }
 
@@ -168,13 +168,13 @@ void ServicesController::on_refreshServicesButton_clicked()
 {
     logL("ServicesController: Refreshing services table");
     populateServicesTable();
-    emit info(tr("Service list refreshed"));
+    emit info("Service list refreshed");
 }
 
 
 void ServicesController::populateServicesTable()
 {
-    logL("ServicesController: Populating services table");
+    //logL("ServicesController: Populating services table");
     QModelIndexList selectedIndexes = m_table->selectionModel()->selectedRows();
     m_model->removeRows(0, m_model->rowCount());
     auto services = get_services();

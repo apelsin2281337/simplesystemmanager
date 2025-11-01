@@ -117,9 +117,9 @@ void TaskManagerController::on_startProcessButton_clicked() {
 
 
     if (process->waitForStarted()) {
-        info("Process started successfully!");
+        emit info("Process started successfully!");
     } else {
-        error("Error. Failed to start process!");
+        emit error("Error. Failed to start process!");
         process->deleteLater();
     }
 
@@ -129,7 +129,7 @@ void TaskManagerController::on_stopProcessButton_clicked() {
     QModelIndexList selected = m_table->selectionModel()->selectedRows();
     if (selected.isEmpty()) {
         logE("TaskManagerController: No process was selected to stop");
-        error(tr("Please select a process first!"));
+        emit error(tr("Please select a process first!"));
         return;
     }
     QModelIndex sourceIndex = m_proxy->mapToSource(selected.first());
@@ -141,7 +141,7 @@ void TaskManagerController::on_stopProcessButton_clicked() {
 
     if (!ok || pid <= 0) {
         logE(("TaskManagerController: Invalid PID format: " + pidStr).toStdString());
-        error(tr("Invalid process ID"));
+        emit error(tr("Invalid process ID"));
         return;
     }
 
@@ -174,10 +174,10 @@ void TaskManagerController::on_stopProcessButton_clicked() {
 
     if (process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0) {
         logL(("TaskManagerController: Successfully terminated process: " + pidStr).toStdString());
-        info(tr("Process terminated successfully"));
+        emit info(tr("Process terminated successfully"));
     } else {
         logE(("TaskManagerController: Failed to terminate process: " + pidStr).toStdString());
-        error(tr("Failed to terminate process"));
+        emit error(tr("Failed to terminate process"));
     }
 
     populateTaskManager();
@@ -185,7 +185,7 @@ void TaskManagerController::on_stopProcessButton_clicked() {
 
 void TaskManagerController::on_updateTasksButton_clicked(){
     populateTaskManager();
-    info("Task Manager was updated!");
+    emit info("Task Manager was updated!");
 }
 
 

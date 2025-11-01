@@ -195,7 +195,7 @@ int disable_service(const std::string &unit_name) {
 }
 
 std::vector<ServiceInfo> get_services() {
-    logL("Fetching list of services");
+    //logL("Fetching list of services");
     sd_bus_error error = SD_BUS_ERROR_NULL;
     sd_bus_message *reply = nullptr;
     sd_bus *bus = nullptr;
