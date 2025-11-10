@@ -20,7 +20,6 @@ class AutostartController;
 class TaskManagerController;
 class ServicesController;
 class TempfilesController;
-
 class Config;
 
 class MainWindow : public QMainWindow
@@ -56,7 +55,7 @@ private:
     std::unique_ptr<TaskManagerController> TmCtl;
     std::unique_ptr<AutostartController> AutostartCtl;
     std::unique_ptr<TempfilesController> TempfilesCtl;
-    void setupControllers();
+    void setupSlots();
     void showError(const QString &message);
     void showInfo(const QString &message);
     void updateCpuUsage();

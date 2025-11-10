@@ -1,7 +1,6 @@
 #include "../include/config_manager.hpp"
-#include "../include/json.hpp"
 #include "../include/logger.hpp"
-
+#include <nlohmann/json.hpp>
 
 #include <iostream>
 #include <fstream>

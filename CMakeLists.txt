@@ -106,6 +106,18 @@ if(NOT Qt6_LUPDATE_EXECUTABLE)
     message(FATAL_ERROR "Qt6_LUPDATE_EXECUTABLE not found. Make sure Qt LinguistTools is installed.")
 endif()
 
+if(DOWNLOAD_MISSING_DEPS)
+    if(NOT TARGET nlohmann_json::nlohmann_json)
+        message(STATUS "Downloading nlohmann/json...")
+        FetchContent_Declare(
+            nlohmann_json
+            GIT_REPOSITORY https://github.com/nlohmann/json.git
+            GIT_TAG v3.11.2
+        )
+        FetchContent_MakeAvailable(nlohmann_json)
+    endif()
+endif()
+
 # Цель для ручного обновления .ts файлов
 add_custom_target(update_translations
     COMMAND ${Qt6_LUPDATE_EXECUTABLE}
@@ -161,24 +173,3 @@ configure_file(
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SystemManager.desktop
     DESTINATION share/applications
 )
-
-# Пакетирование
-set(CPACK_PACKAGE_NAME "System Manager")
-set(CPACK_PACKAGE_VENDOR "apelsin")
-set(CPACK_PACKAGE_VERSION "1.0.2")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "System Management Tool")
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
-
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "apelsин <ggwp.gg6578@gmail.com>")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6core6, libqt6gui6, libqt6widgets6, libqt6charts6, policykit-1")
-set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
-
-set(CPACK_RPM_PACKAGE_REQUIRES "qt6-qtbase >= 6.2, qt6-qtcharts >= 6.2, polkit")
-set(CPACK_RPM_PACKAGE_LICENSE "MIT")
-set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/bin")
-set(CPACK_RPM_SPEC_MORE_DEFINES "%define _binary_payload w9.gzdio")
-set(CPACK_RPM_USER_FILELIST
-    "%attr(755,root,root) /usr/bin/systemmanager-start"
-)
-
-include(CPack)

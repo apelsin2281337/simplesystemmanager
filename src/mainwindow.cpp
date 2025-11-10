@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupModels();
     setupTables();
     setupTimers();
-    setupControllers();
+    setupSlots();
     //не менять сломается инет
     resourceTimer->start(1000);
     chartUpdateTimer->start(700);
@@ -54,43 +54,43 @@ void MainWindow::setupComboBoxes(){
     ui->languageComboBox->setCurrentIndex(0);
 }
 
-void MainWindow::setupControllers(){
+void MainWindow::setupSlots(){
     SvcCtl = std::make_unique<ServicesController>(ui->servicesTable, servicesModel.get(), servicesProxyModel.get());
-    connect(ui->startServiceButton,         &QPushButton::clicked, SvcCtl.get(),      &ServicesController::on_startServiceButton_clicked);\
-    connect(ui->stopServiceButton,          &QPushButton::clicked, SvcCtl.get(),      &ServicesController::on_stopServiceButton_clicked);
-    connect(ui->enableServiceButton,        &QPushButton::clicked, SvcCtl.get(),      &ServicesController::on_enableServiceButton_clicked);
-    connect(ui->disableServiceButton,       &QPushButton::clicked, SvcCtl.get(),      &ServicesController::on_disableServiceButton_clicked);
-    connect(ui->refreshServicesButton,      &QPushButton::clicked, SvcCtl.get(),     &ServicesController::on_refreshServicesButton_clicked);
-    connect(ui->searchServicesLineEdit,     &QLineEdit::textChanged, SvcCtl.get(), &ServicesController::on_searchServicesTextChanged);
-    connect(SvcCtl.get(),                   &ServicesController::info,  this, &MainWindow::showInfo);
-    connect(SvcCtl.get(),                   &ServicesController::error, this, &MainWindow::showError);
+    connect(ui->startServiceButton,         &QPushButton::clicked, SvcCtl.get(),        &ServicesController::on_startServiceButton_clicked);\
+    connect(ui->stopServiceButton,          &QPushButton::clicked, SvcCtl.get(),        &ServicesController::on_stopServiceButton_clicked);
+    connect(ui->enableServiceButton,        &QPushButton::clicked, SvcCtl.get(),        &ServicesController::on_enableServiceButton_clicked);
+    connect(ui->disableServiceButton,       &QPushButton::clicked, SvcCtl.get(),        &ServicesController::on_disableServiceButton_clicked);
+    connect(ui->refreshServicesButton,      &QPushButton::clicked, SvcCtl.get(),        &ServicesController::on_refreshServicesButton_clicked);
+    connect(ui->searchServicesLineEdit,     &QLineEdit::textChanged, SvcCtl.get(),      &ServicesController::on_searchServicesTextChanged);
+    connect(SvcCtl.get(),                   &ServicesController::info,  this,           &MainWindow::showInfo);
+    connect(SvcCtl.get(),                   &ServicesController::error, this,           &MainWindow::showError);
     SvcCtl->populateServicesTable();
 
     TmCtl = std::make_unique<TaskManagerController>(ui->taskManagerTable, taskManagerModel.get(), taskManagerProxyModel.get(), this, this);
     connect(ui->startProcessButton,         &QPushButton::clicked, TmCtl.get(),         &TaskManagerController::on_startProcessButton_clicked);
-    connect(ui->stopProcessButton,          &QPushButton::clicked, TmCtl.get(),          &TaskManagerController::on_stopProcessButton_clicked);
-    connect(ui->updateTasksButton,          &QPushButton::clicked, TmCtl.get(),          &TaskManagerController::on_updateTasksButton_clicked);
+    connect(ui->stopProcessButton,          &QPushButton::clicked, TmCtl.get(),         &TaskManagerController::on_stopProcessButton_clicked);
+    connect(ui->updateTasksButton,          &QPushButton::clicked, TmCtl.get(),         &TaskManagerController::on_updateTasksButton_clicked);
     connect(ui->searchTaskLineEdit,         &QLineEdit::textChanged, TmCtl.get(),       &TaskManagerController::on_searchTaskLineEdit_textChanged);
     TmCtl->populateTaskManager();
-    connect(TmCtl.get(),                    &TaskManagerController::info,  this, &MainWindow::showInfo);
-    connect(TmCtl.get(),                    &TaskManagerController::error, this, &MainWindow::showError);
+    connect(TmCtl.get(),                    &TaskManagerController::info,  this,        &MainWindow::showInfo);
+    connect(TmCtl.get(),                    &TaskManagerController::error, this,        &MainWindow::showError);
 
     AutostartCtl = std::make_unique<AutostartController>(ui->autostartTable, autostartModel.get(), this, this);
-    connect(ui->addEntryButton,             &QPushButton::clicked, AutostartCtl.get(),      &AutostartController::on_addEntryButton_clicked);
-    connect(ui->removeEntryButton,          &QPushButton::clicked, AutostartCtl.get(),   &AutostartController::on_removeEntryButton_clicked);
-    connect(ui->enableEntryButton,          &QPushButton::clicked, AutostartCtl.get(),   &AutostartController::on_enableEntryButton_clicked);
-    connect(ui->updateEntriesButton,        &QPushButton::clicked, AutostartCtl.get(), &AutostartController::on_updateEntriesButton_clicked);
+    connect(ui->addEntryButton,             &QPushButton::clicked, AutostartCtl.get(),  &AutostartController::on_addEntryButton_clicked);
+    connect(ui->removeEntryButton,          &QPushButton::clicked, AutostartCtl.get(),  &AutostartController::on_removeEntryButton_clicked);
+    connect(ui->enableEntryButton,          &QPushButton::clicked, AutostartCtl.get(),  &AutostartController::on_enableEntryButton_clicked);
+    connect(ui->updateEntriesButton,        &QPushButton::clicked, AutostartCtl.get(),  &AutostartController::on_updateEntriesButton_clicked);
     AutostartCtl->populateAutostartTable();
-    connect(AutostartCtl.get(),             &AutostartController::info,  this, &MainWindow::showInfo);
-    connect(AutostartCtl.get(),             &AutostartController::error, this, &MainWindow::showError);
+    connect(AutostartCtl.get(),             &AutostartController::info,  this,          &MainWindow::showInfo);
+    connect(AutostartCtl.get(),             &AutostartController::error, this,          &MainWindow::showError);
 
     TempfilesCtl = std::make_unique<TempfilesController>(ui->tempFilesTable, tempFilesModel.get(), this, this);
-    connect(ui->scanTempFilesButton,        &QPushButton::clicked, TempfilesCtl.get(),         &TempfilesController::on_scanTempFilesButton_clicked);
-    connect(ui->clearSelectedFilesButton,   &QPushButton::clicked, TempfilesCtl.get(),    &TempfilesController::on_clearSelectedFilesButton_clicked);
-    connect(ui->selectAllFilesButton,       &QPushButton::clicked, TempfilesCtl.get(),        &TempfilesController::on_selectAllFilesButton_clicked);
-    connect(ui->deleteSelectedFilesButton,  &QPushButton::clicked, TempfilesCtl.get(),&TempfilesController::on_deleteSelectedFilesButton_clicked);
-    connect(TempfilesCtl.get(),             &TempfilesController::info,  this, &MainWindow::showInfo);
-    connect(TempfilesCtl.get(),             &TempfilesController::error, this, &MainWindow::showError);
+    connect(ui->scanTempFilesButton,        &QPushButton::clicked, TempfilesCtl.get(),  &TempfilesController::on_scanTempFilesButton_clicked);
+    connect(ui->clearSelectedFilesButton,   &QPushButton::clicked, TempfilesCtl.get(),  &TempfilesController::on_clearSelectedFilesButton_clicked);
+    connect(ui->selectAllFilesButton,       &QPushButton::clicked, TempfilesCtl.get(),  &TempfilesController::on_selectAllFilesButton_clicked);
+    connect(ui->deleteSelectedFilesButton,  &QPushButton::clicked, TempfilesCtl.get(),  &TempfilesController::on_deleteSelectedFilesButton_clicked);
+    connect(TempfilesCtl.get(),             &TempfilesController::info,  this,          &MainWindow::showInfo);
+    connect(TempfilesCtl.get(),             &TempfilesController::error, this,          &MainWindow::showError);
 }
 
 
@@ -323,7 +323,7 @@ void MainWindow::updateInternetUsage(){
             unitIndex++;
         }
 
-        return QString("%1 %2").arg(QString::number(speed, 'f', 2)).arg(units[unitIndex]);
+        return QString("%1 %2").arg(QString::number(speed, 'f', 2), units[unitIndex]);
     };
     ui->downloadLabel->setText(tr("Download: %1").arg(formatSpeed(network.rx_speed)));
     ui->uploadLabel->setText(tr("Upload: %1").arg(formatSpeed(network.tx_speed)));
