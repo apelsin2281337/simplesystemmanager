@@ -31,7 +31,7 @@ set(Qt6_LUPDATE_EXECUTABLE "/usr/bin/lupdate")
 
 # Qt компоненты
 find_package(Qt6 REQUIRED COMPONENTS
-    Core Gui Widgets Charts Multimedia LinguistTools
+    Core Gui Widgets Charts LinguistTools
 )
 find_package(Qt6 COMPONENTS WaylandClient)
 
@@ -85,7 +85,6 @@ set(FORMS mainwindow.ui)
 set(RESOURCES
     resources/icon.qrc
     resources/themes.qrc
-    resources/haha.qrc
     resources/transtations.qrc
 )
 

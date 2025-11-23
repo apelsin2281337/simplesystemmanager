@@ -12,10 +12,7 @@
 
 int main(int argc, char *argv[])
 {
-    QTranslator translator;
-    if (translator.load(QLocale(), "qtguiinterface", "_", ":/translations")) {
-        QCoreApplication::installTranslator(&translator);
-    }
+    
 
     logL("Application has started!");
     QApplication a(argc, argv);
@@ -25,6 +22,10 @@ int main(int argc, char *argv[])
                               QObject::tr("This program requires root privileges. Please restart it using sudo/doas"));
 
         return 1;
+    }
+    QTranslator translator;
+    if (translator.load(QLocale(), "qtguiinterface", "_", ":/translations")) {
+        QCoreApplication::installTranslator(&translator);
     }
     MainWindow w;
     w.show();

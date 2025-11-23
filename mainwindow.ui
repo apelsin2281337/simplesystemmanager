@@ -54,44 +54,12 @@
         </property>
        </spacer>
       </item>
-      <item>
-       <widget class="QLabel" name="catGeneratorLabel">
-        <property name="text">
-         <string>Cat Generator</string>
-        </property>
-        <property name="textInteractionFlags">
-         <set>Qt::TextInteractionFlag::NoTextInteraction</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="catButton">
-        <property name="maximumSize">
-         <size>
-          <width>256</width>
-          <height>64</height>
-         </size>
-        </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>I Shall Become a Cat</string>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>64</width>
-          <height>64</height>
-         </size>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabResources">
        <attribute name="title">

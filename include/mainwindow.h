@@ -32,7 +32,6 @@ public:
 
 
 private slots:
-    void on_catButton_clicked();
     void onThemeChanged(int index);
     void onLanguageChanged(int index);
 

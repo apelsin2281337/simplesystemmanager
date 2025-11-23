@@ -127,8 +127,6 @@ void MainWindow::setupModels()
 
     taskManagerProxyModel = std::make_unique<QSortFilterProxyModel>(this);
     setupProxyModel(taskManagerProxyModel.get(), taskManagerModel.get());
-    ui->taskManagerTable->setModel(taskManagerProxyModel.get());
-    ui->taskManagerTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
 
@@ -172,6 +170,16 @@ void MainWindow::setupTables(){
     prevCpuStats = Resmon::get_cpu_usage();
 
     ui->taskManagerTable->setModel(taskManagerProxyModel.get());
+    ui->taskManagerTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    // forgive me god
+    ui->taskManagerTable->setModel(taskManagerProxyModel.get());
+    ui->taskManagerTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    for (int i = 0; i < taskManagerProxyModel->columnCount(); ++i) {
+        ui->taskManagerTable->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Stretch);
+    }
+    ui->taskManagerTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Interactive);
+    //wasnt that bad after all
 }
 
 void MainWindow::setupTimers(){
@@ -197,22 +205,6 @@ void MainWindow::setupTimers(){
         updateChart(usage);
     });
 }
-
-
-
-void MainWindow::on_catButton_clicked(){
-    ui->catButton->setMaximumWidth(64);
-    ui->catButton->setText("");
-
-    const int maxCats = 34;
-    int randomIndex = QRandomGenerator::global()->bounded(maxCats);
-
-    QString imagePath = QString(":cats/cat%1.jpg").arg(randomIndex);
-    logL(imagePath.toStdString());
-    ui->catButton->setIcon(QIcon(imagePath));
-}
-
-
 
 void MainWindow::updateChart(double usage)
 {
